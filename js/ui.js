@@ -2931,10 +2931,17 @@ class GameUI {
                 markGemViewed();
             });
 
-            // 点击卡片：toggle active（手机兼容），同时关闭其他已打开的面板
+            // 点击卡片：仅触摸设备使用 toggle active（手机兼容）
+            // PC 端有 hover 能力，不需要点击 toggle，避免 hover 和 click 冲突
+            const hasHover = window.matchMedia('(hover: hover)').matches;
             card.addEventListener('click', (e) => {
+                if (hasHover) {
+                    // PC 端：点击只标记已查看，不做 toggle
+                    markGemViewed();
+                    return;
+                }
+                // 触摸设备：toggle active
                 const isActive = card.classList.contains('active');
-                // 关闭所有已打开的宝石面板
                 document.querySelectorAll('.gem-card.active').forEach(c => c.classList.remove('active'));
                 if (!isActive) {
                     adjustPanelPosition();
