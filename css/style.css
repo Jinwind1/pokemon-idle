@@ -2420,6 +2420,20 @@ body {
         border-radius: 8px;
     }
 
+    #enemy-side, #player-side {
+        gap: 6px;
+    }
+
+    .pokemon-sprite {
+        width: 140px;
+        height: 140px;
+    }
+
+    .pokemon-sprite img {
+        width: 140px;
+        height: 140px;
+    }
+
     .pokemon-battle-info {
         width: 220px;
         padding: 4px 6px;
