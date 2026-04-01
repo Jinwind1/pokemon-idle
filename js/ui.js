@@ -2913,24 +2913,33 @@ class GameUI {
             };
 
             // 根据位置自动调整悬浮面板方向（靠右时左对齐，避免被裁切）
-            card.addEventListener('mouseenter', () => {
+            const adjustPanelPosition = () => {
                 const panel = card.querySelector('.gem-hover-panel');
                 if (panel) {
                     card.classList.remove('align-right');
                     const cardRect = card.getBoundingClientRect();
                     const panelWidth = Math.min(280, window.innerWidth * 0.8);
-                    // 弹窗在卡片右侧显示，需要判断卡片右边缘 + 弹窗宽度是否超出视口
                     const overflowRight = cardRect.right + panelWidth > window.innerWidth - 8;
                     if (overflowRight) {
                         card.classList.add('align-right');
                     }
                 }
+            };
 
+            card.addEventListener('mouseenter', () => {
+                adjustPanelPosition();
                 markGemViewed();
             });
 
-            // 点击卡片也视为“查看”
-            card.addEventListener('click', () => {
+            // 点击卡片：toggle active（手机兼容），同时关闭其他已打开的面板
+            card.addEventListener('click', (e) => {
+                const isActive = card.classList.contains('active');
+                // 关闭所有已打开的宝石面板
+                document.querySelectorAll('.gem-card.active').forEach(c => c.classList.remove('active'));
+                if (!isActive) {
+                    adjustPanelPosition();
+                    card.classList.add('active');
+                }
                 markGemViewed();
             });
 
@@ -2987,7 +2996,15 @@ class GameUI {
             container.appendChild(card);
         }
 
-
+        // 点击空白处关闭所有宝石面板（手机兼容）
+        if (!this._gemBagClickOutsideBound) {
+            this._gemBagClickOutsideBound = true;
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.gem-card')) {
+                    document.querySelectorAll('.gem-card.active').forEach(c => c.classList.remove('active'));
+                }
+            });
+        }
 
     }
 

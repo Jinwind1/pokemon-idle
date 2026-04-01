@@ -3038,7 +3038,8 @@ body {
 }
 
 .gem-card:hover .gem-hover-panel,
-.gem-card:focus-within .gem-hover-panel {
+.gem-card:focus-within .gem-hover-panel,
+.gem-card.active .gem-hover-panel {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
