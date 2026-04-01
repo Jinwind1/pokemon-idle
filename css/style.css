@@ -1680,6 +1680,65 @@ body {
     background: rgba(231, 76, 60, 0.2);
 }
 
+/* 版本更新记录 */
+.changelog {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.changelog-item {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.changelog-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.changelog-version {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+}
+
+.changelog-date {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-left: 6px;
+}
+
+.changelog-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.changelog-list li {
+    font-size: 12px;
+    color: var(--text-secondary);
+    padding: 2px 0;
+    padding-left: 8px;
+    position: relative;
+}
+
+.changelog-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+}
+
 .settings-disclaimer {
     margin-top: 2px;
     padding: 10px 12px;
