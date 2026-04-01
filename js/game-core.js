@@ -2934,7 +2934,7 @@ class GameCore {
         if (talentGemReduce > 0) {
             const commonQ = qualities.find(q => q.id === 'common');
             if (commonQ) {
-                commonQ.weight = Math.max(100, commonQ.weight * (1 - talentGemReduce / 100));
+                commonQ.weight = Math.max(0, commonQ.weight * (1 - talentGemReduce / 100));
             }
         }
         const totalWeight = qualities.reduce((s, q) => s + q.weight, 0);
