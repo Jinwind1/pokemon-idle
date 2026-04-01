@@ -399,6 +399,13 @@ class GameUI {
                 this.addBattleLog(`💫 闪避了敌方的攻击！`, 'attack');
                 break;
             case 'towerEnemyDefeated':
+                // 将敌方HP条动画归零
+                this.updateBattleHP({
+                    playerHp: data.playerHp,
+                    playerMaxHp: data.playerMaxHp,
+                    enemyHp: 0,
+                    enemyMaxHp: 1,
+                });
                 this.addBattleLog(`🏝️ 挑战塔：击败了第 ${data.floorIndex}/${data.totalEnemies} 只敌人！`, 'evolution');
                 break;
             case 'towerFloorCleared':
