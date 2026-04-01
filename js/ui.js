@@ -2939,6 +2939,9 @@ class GameUI {
                 if (!isActive) {
                     adjustPanelPosition();
                     card.classList.add('active');
+                    container.classList.add('has-active-gem');
+                } else {
+                    container.classList.remove('has-active-gem');
                 }
                 markGemViewed();
             });
@@ -3002,6 +3005,8 @@ class GameUI {
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.gem-card')) {
                     document.querySelectorAll('.gem-card.active').forEach(c => c.classList.remove('active'));
+                    const gemList = document.getElementById('gem-bag-list');
+                    if (gemList) gemList.classList.remove('has-active-gem');
                 }
             });
         }

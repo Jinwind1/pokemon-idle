@@ -3038,7 +3038,21 @@ body {
 }
 
 .gem-card:hover .gem-hover-panel,
-.gem-card:focus-within .gem-hover-panel,
+.gem-card:focus-within .gem-hover-panel {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* 有 active 面板时，禁用其他卡片的 hover 弹出 */
+.has-active-gem .gem-card:hover .gem-hover-panel,
+.has-active-gem .gem-card:focus-within .gem-hover-panel {
+    opacity: 0;
+    transform: translateY(-5px);
+    pointer-events: none;
+}
+
+/* active 的卡片始终显示面板 */
 .gem-card.active .gem-hover-panel {
     opacity: 1;
     transform: translateY(0);
