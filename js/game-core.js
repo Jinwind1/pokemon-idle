@@ -2714,12 +2714,20 @@ class GameCore {
     exportSave() {
         if (!this.gameState) return '';
         this.save();
-        return btoa(JSON.stringify(this.gameState));
+        return btoa(unescape(encodeURIComponent(JSON.stringify(this.gameState))));
     }
 
     importSave(dataStr) {
         try {
-            const decoded = atob(dataStr.trim());
+            let decoded;
+            const raw = atob(dataStr.trim());
+            try {
+                // 新版存档：UTF-8 编码
+                decoded = decodeURIComponent(escape(raw));
+            } catch (_) {
+                // 旧版存档：纯 Latin1
+                decoded = raw;
+            }
             const data = JSON.parse(decoded);
 
             // 基本验证

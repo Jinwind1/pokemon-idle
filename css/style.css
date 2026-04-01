@@ -4374,6 +4374,10 @@ body {
     font-weight: 600;
     color: var(--text-primary);
     text-align: center;
+    width: 100%;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    line-height: 1.3;
 }
 
 .tower-enemy-level {

@@ -3130,7 +3130,7 @@ class GameUI {
                 let html = '';
                 for (let i = 0; i < tower.enemies.length; i++) {
                     const enemy = tower.enemies[i];
-                    const spriteUrl = `sprites/${enemy.id}.png`;
+                    const spriteUrl = `sprites/pokemon/${enemy.id}.png`;
                     html += `
                         <div class="tower-enemy-card">
                             <div class="tower-enemy-sprite">
