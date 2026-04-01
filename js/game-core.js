@@ -2339,6 +2339,11 @@ class GameCore {
                     this.currentBattle.playerTimer = Math.floor(this.currentBattle.playerNextAttack * oldAttackProgress);
                     // 保留 enemyTimer 不变
 
+                    // 挑战塔模式下同步更新 HP 百分比
+                    if (this._towerMode) {
+                        this._towerPlayerHpPercent = this.currentBattle.playerCurrentHp / this.currentBattle.playerMaxHp;
+                    }
+
                     if (this.onBattleEvent) {
                         this.onBattleEvent('start', this.currentBattle);
                     }
@@ -3761,6 +3766,18 @@ class GameCore {
 
         const enemy = tower.enemies[tower.currentEnemyIndex];
         const enemyStats = this.calculateStats(enemy);
+
+        // 自动更换最优宝可梦出战（与主线战斗一致）
+        if (this.gameState.settings?.autoSwitchBest && this.gameState.team.length > 1) {
+            const bestIndex = this.getBestTeamMemberForEnemy(enemy);
+            if (bestIndex !== -1 && bestIndex !== this.gameState.activePokemonIndex) {
+                this.gameState.activePokemonIndex = bestIndex;
+                this.save();
+                if (this.onBattleEvent) {
+                    this.onBattleEvent('autoSwitched', { newIndex: bestIndex });
+                }
+            }
+        }
 
         // 获取玩家战斗属性
         const playerStats = this.calculateBattleStats(this.gameState.activePokemonIndex);
