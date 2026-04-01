@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.5">
+    <title>宝可梦挂机放置游戏</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部状态栏 -->
+        <header id="header">
+            <h1>宝可梦收集放置 <span class="version-tag">v1.83</span></h1>
+            <span class="author-tag">by: jinwind</span>
+        </header>
+
+        <!-- 主内容区 -->
+        <main id="main-content">
+            <!-- Tab 1: 战斗界面 -->
+            <div id="tab-battle" class="tab-content active">
+                <div id="battle-area">
+                    <div id="battle-scene">
+                        <div id="enemy-side">
+                            <div id="enemy-info" class="pokemon-battle-info">
+                                <span id="enemy-name">???</span>
+                                <span id="enemy-level">Lv.?</span>
+                                <div id="enemy-types" class="battle-types"></div>
+                                <div class="hp-bar-wrapper">
+                                    <div class="hp-bar-container">
+                                        <div id="enemy-hp-bar" class="hp-bar"></div>
+                                        <span id="enemy-hp-text" class="hp-text"></span>
+                                    </div>
+                                </div>
+                                <div class="atk-bar-container">
+                                    <span class="atk-bar-label">⚔️</span>
+                                    <div class="atk-bar-track">
+                                        <div id="enemy-atk-bar" class="atk-bar-fill enemy"></div>
+                                    </div>
+                                </div>
+                                <div id="enemy-matchup" class="matchup-indicator"></div>
+                            </div>
+                            <div id="enemy-sprite" class="pokemon-sprite"></div>
+                        </div>
+                        <div id="player-side">
+                            <div id="player-sprite" class="pokemon-sprite"></div>
+                            <div id="player-info" class="pokemon-battle-info">
+                                <span id="player-name">???</span>
+                                <span id="player-level">Lv.?</span>
+                                <div id="player-types" class="battle-types"></div>
+                                <div class="hp-bar-wrapper">
+                                    <div class="hp-bar-container">
+                                        <div id="player-hp-bar" class="hp-bar"></div>
+                                        <span id="player-hp-text" class="hp-text"></span>
+                                    </div>
+                                </div>
+                                <div class="atk-bar-container">
+                                    <span class="atk-bar-label">⚔️</span>
+                                    <div class="atk-bar-track">
+                                        <div id="player-atk-bar" class="atk-bar-fill player"></div>
+                                    </div>
+                                </div>
+                                <div id="player-matchup" class="matchup-indicator"></div>
+                            </div>
+                        </div>
+                        <div id="type-matchup" class="type-matchup-info"></div>
+                    </div>
+                    <div id="battle-log">
+                        <div id="battle-messages"></div>
+                    </div>
+                </div>
+                <div id="info-panel">
+                    <div id="panel-team" class="panel-content active">
+                        <div id="team-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: 地图界面 -->
+            <div id="tab-map" class="tab-content">
+                <div id="map-container">
+                    <div id="region-panel">
+                        <h2>🗺️ 选择地区</h2>
+                        <div id="region-list"></div>
+                    </div>
+                    <div id="route-panel">
+                        <h2 id="region-title">请选择地区</h2>
+                        <div id="route-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: 徽章界面 -->
+            <div id="tab-badge" class="tab-content">
+                <div id="badge-container">
+                    <!-- 金币信息 -->
+                    <div id="badge-header">
+                        <h2>🏅 徽章</h2>
+                        <div id="gold-display">🪙 <span id="gold-amount">0</span></div>
+                    </div>
+                    <!-- 徽章列表 -->
+                    <div id="badge-list"></div>
+                    <!-- 商店 -->
+                    <div id="shop-section">
+                        <h3>🏪 宝石商店</h3>
+                        <p class="shop-desc">花费金币购买随机宝石，镶嵌到徽章中增强能力</p>
+                        <div id="shop-actions">
+                            <button id="btn-buy-gem" class="shop-buy-btn">🪙 1000 购买宝石</button>
+                            <button id="btn-buy-all-gems" class="shop-buy-btn batch" title="快捷键 B">🛒 全部购买 (B)</button>
+                            <span id="gem-bag-count">背包: 0/50</span>
+                        </div>
+                        <div id="synthesis-actions">
+                            <button class="gem-synthesis-btn" data-target-quality="magic">✨ 合成魔法宝石</button>
+                            <button class="gem-synthesis-btn" data-target-quality="rare">✨ 合成稀有宝石</button>
+                            <button class="gem-synthesis-btn" data-target-quality="epic">✨ 合成史诗宝石</button>
+                            <button class="gem-synthesis-btn" data-target-quality="mythic">✨ 合成神话宝石</button>
+                            <button class="gem-synthesis-btn" data-target-quality="legendary">✨ 合成传说宝石</button>
+                            <button class="gem-synthesis-btn" data-target-quality="eternal">✨ 合成永恒宝石</button>
+                            <button id="btn-reforge-eternal" class="gem-synthesis-btn reforge">🔨 重铸永恒宝石</button>
+                            <button id="btn-synthesize-all" class="gem-synthesis-btn batch" title="快捷键 S">🔄 一键合成 (S)</button>
+                        </div>
+                    </div>
+                    <!-- 宝石背包 -->
+                    <div id="gem-bag-section">
+                        <h3>💎 宝石背包</h3>
+                        <div id="gem-bag-list"></div>
+                    </div>
+                    <!-- 宝石加成总览 -->
+                    <div id="gem-bonus-section">
+                        <h3>📊 宝石加成总览</h3>
+                        <div id="gem-bonus-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: 树果界面 -->
+            <div id="tab-berry" class="tab-content">
+                <div id="berry-container">
+                    <div id="berry-header">
+                        <h2>🌱 树果花园</h2>
+                        <div class="berry-header-right">
+                            <div id="berry-bag-summary"></div>
+                            <div id="berry-gold-display">🪙 <span id="berry-gold-amount">0</span></div>
+                        </div>
+                    </div>
+                    <!-- 种植区 -->
+                    <div id="berry-garden-section">
+                        <h3>🌿 种植区 <span id="berry-plot-count">0/10</span></h3>
+                        <div id="berry-garden-actions">
+                            <button id="btn-harvest-all" class="berry-action-btn harvest">🧺 一键采摘</button>
+                        </div>
+                        <div id="berry-plots-grid"></div>
+                    </div>
+                    <!-- 背包 -->
+                    <div id="berry-bag-section">
+                        <h3>🎒 树果背包</h3>
+                        <div id="berry-bag-grid"></div>
+                    </div>
+                    <!-- 种植选择 -->
+                    <div id="berry-plant-section">
+                        <h3>🌰 购买种子</h3>
+                        <p class="berry-plant-desc">花费50,000金币购买种子种植，5小时后成熟可采摘1~2个树果</p>
+                        <div id="berry-plant-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 5: 技能界面 -->
+            <div id="tab-skill" class="tab-content">
+                <div id="skill-container">
+                    <div id="skill-header">
+                        <h2>⚡ 技能系统</h2>
+                    </div>
+                    <!-- 规则说明 -->
+                    <div id="skill-rules-section">
+                        <h3>📋 技能规则</h3>
+                        <div id="skill-rules-content"></div>
+                    </div>
+                    <!-- 技能列表 -->
+                    <div id="skill-table-section">
+                        <h3>📊 各属性技能一览</h3>
+                        <div id="skill-table-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 5.5: 天赋界面 -->
+            <div id="tab-talent" class="tab-content">
+                <div id="talent-container">
+                    <div id="talent-header">
+                        <h2>🌟 天赋系统</h2>
+                        <div id="talent-points-display"></div>
+                    </div>
+                    <!-- 规则说明 -->
+                    <div id="talent-rules-section">
+                        <h3>📋 天赋规则</h3>
+                        <div id="talent-rules-content"></div>
+                    </div>
+                    <!-- 操作区 -->
+                    <div id="talent-actions">
+                        <button id="btn-reset-talents" class="talent-reset-btn">🔄 重置天赋（100万金币）</button>
+                    </div>
+                    <!-- 天赋列表 -->
+                    <div id="talent-list-section">
+                        <h3>📊 天赋列表</h3>
+                        <div id="talent-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 5.6: 挑战岛界面 -->
+            <div id="tab-tower" class="tab-content">
+                <div id="tower-container">
+                    <div id="tower-header">
+                        <h2>🏝️ 挑战岛</h2>
+                        <div id="tower-floor-display"></div>
+                    </div>
+                    <!-- 加成信息 -->
+                    <div id="tower-bonus-section">
+                        <h3>📊 通关加成</h3>
+                        <div id="tower-bonus-info"></div>
+                    </div>
+                    <!-- 规则说明 -->
+                    <div id="tower-rules-section">
+                        <h3>📋 挑战规则</h3>
+                        <div id="tower-rules-content"></div>
+                    </div>
+                    <!-- 当前层信息 -->
+                    <div id="tower-floor-section">
+                        <h3 id="tower-floor-title">第 1 层</h3>
+                        <div id="tower-enemies-grid"></div>
+                    </div>
+                    <!-- 操作按钮 -->
+                    <div id="tower-actions">
+                        <button id="btn-tower-start" class="tower-action-btn start">⚔️ 开始挑战</button>
+                        <button id="btn-tower-flee" class="tower-action-btn flee" style="display:none;">🏃 撤退</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 6: 图鉴界面 -->
+            <div id="tab-pokedex" class="tab-content">
+                <div id="pokedex-container">
+                    <h2>📖 宝可梦图鉴 <span id="pokedex-caught">已捕获: 0</span></h2>
+                    <div id="pokedex-region-filters">
+                        <button class="region-filter-btn active" data-region="all">全部</button>
+                        <button class="region-filter-btn" data-region="kanto">关都地区</button>
+                        <button class="region-filter-btn" data-region="johto">城都地区</button>
+                        <button class="region-filter-btn" data-region="hoenn">丰缘地区</button>
+                        <button class="region-filter-btn" data-region="sinnoh">神奥地区</button>
+                        <button class="region-filter-btn" data-region="unova">合众地区</button>
+                        <button class="region-filter-btn" data-region="kalos">卡洛斯地区</button>
+                        <button class="region-filter-btn" data-region="alola">阿罗拉地区</button>
+                        <button class="region-filter-btn" data-region="galar">伽勒尔地区</button>
+                        <button class="region-filter-btn" data-region="paldea">帕底亚地区</button>
+                    </div>
+                    <div id="pokedex-filters">
+                        <button class="filter-btn active" data-filter="all">全部</button>
+                        <button class="filter-btn" data-filter="caught">已捕获</button>
+                        <button class="filter-btn" data-filter="uncaught">未捕获</button>
+                        <button class="filter-btn shiny-filter" data-filter="shiny">✨ 闪光</button>
+                        <button class="filter-btn not-shiny-filter" data-filter="not_shiny">未闪光</button>
+                    </div>
+                    <div id="pokedex-sub-filters" class="hidden">
+                        <button class="sub-filter-btn active" data-sort="none">默认排序</button>
+                        <button class="sub-filter-btn" data-sort="power">战力排序</button>
+                        <button class="sub-filter-btn" data-sort="potential">潜力排序</button>
+                        <button class="sub-filter-btn" data-sort="level">等级排序</button>
+                    </div>
+                    <div id="pokedex-grid"></div>
+                </div>
+            </div>
+
+            <!-- Tab 6: 设置界面 -->
+            <div id="tab-settings" class="tab-content">
+                <div id="settings-container">
+                    <h2>⚙️ 设置</h2>
+                    <div class="settings-section">
+                        <h3>🎮 游戏选项</h3>
+                        <label class="setting-toggle">
+                            <input type="checkbox" id="setting-auto-switch">
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label">自动更换最优宝可梦出战</span>
+                        </label>
+                        <p class="setting-desc">遭遇新敌人时，自动选择队伍中对其伤害最高的宝可梦出战</p>
+                        <div id="oneshot-strategy-group" class="setting-radio-group" style="display:none;">
+                            <p class="setting-radio-label">⚡ 一击必杀时优先选择：</p>
+                            <label class="setting-radio"><input type="radio" name="oneshot-strategy" value="fastest"> 🏃 速度最快（清怪更快）</label>
+                            <label class="setting-radio"><input type="radio" name="oneshot-strategy" value="lowest_level"> 📈 等级最低（练级优先）</label>
+                            <label class="setting-radio"><input type="radio" name="oneshot-strategy" value="no_change"> 🔒 不改变（保持当前出战）</label>
+                        </div>
+                        <label class="setting-toggle" id="setting-auto-route-wrapper">
+                            <input type="checkbox" id="setting-auto-route">
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label">🔄 自动切换地图</span>
+                        </label>
+                        <p class="setting-desc" id="setting-auto-route-desc">当前地图所有宝可梦达成条件后，自动前往下一个未完成的地图</p>
+                        <div id="route-switch-condition-group" class="setting-radio-group" style="display:none;">
+                            <p class="setting-radio-label">📋 切换条件：</p>
+                            <label class="setting-radio"><input type="radio" name="route-switch-condition" value="6v_shiny"> ✨ 全部6V且闪光后切换</label>
+                            <label class="setting-radio"><input type="radio" name="route-switch-condition" value="6v_only"> 🎯 全部6V后切换</label>
+                        </div>
+                    </div>
+                    <div class="settings-section gameplay-entry">
+                        <h3>📘 游戏玩法说明</h3>
+                        <p class="gameplay-entry-desc">点击查看名词解释、战斗属性来源与经验分配规则</p>
+                        <button id="btn-gameplay-help" class="setting-btn">查看玩法说明</button>
+                    </div>
+                    <div class="settings-section">
+                        <h3>🎨 主题颜色</h3>
+                        <div id="theme-picker" class="theme-picker">
+                            <button class="theme-color-btn active" data-theme="midnight" title="午夜蓝">
+                                <span class="theme-preview" style="background: linear-gradient(135deg, #1a1a2e, #0f3460); border: 2px solid #e94560;"></span>
+                                <span class="theme-label">午夜蓝</span>
+                            </button>
+                            <button class="theme-color-btn" data-theme="forest" title="森林绿">
+                                <span class="theme-preview" style="background: linear-gradient(135deg, #1a2e1a, #0f4a2e); border: 2px solid #2ecc71;"></span>
+                                <span class="theme-label">森林绿</span>
+                            </button>
+                            <button class="theme-color-btn" data-theme="sakura" title="樱花粉">
+                                <span class="theme-preview" style="background: linear-gradient(135deg, #2e1a2a, #4a1a3e); border: 2px solid #e91e90;"></span>
+                                <span class="theme-label">樱花粉</span>
+                            </button>
+                            <button class="theme-color-btn" data-theme="ocean" title="深海蓝">
+                                <span class="theme-preview" style="background: linear-gradient(135deg, #0a1628, #0a2a4a); border: 2px solid #00b4d8;"></span>
+                                <span class="theme-label">深海蓝</span>
+                            </button>
+                            <button class="theme-color-btn" data-theme="sunset" title="落日橙">
+                                <span class="theme-preview" style="background: linear-gradient(135deg, #2e1a10, #4a2a10); border: 2px solid #f39c12;"></span>
+                                <span class="theme-label">落日橙</span>
+                            </button>
+                            <button class="theme-color-btn" data-theme="purple" title="暗夜紫">
+                                <span class="theme-preview" style="background: linear-gradient(135deg, #1a1030, #2a1850); border: 2px solid #9b59b6;"></span>
+                                <span class="theme-label">暗夜紫</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>💾 存档管理</h3>
+                        <div class="settings-buttons">
+                            <button id="btn-save" class="setting-btn">手动保存</button>
+                            <button id="btn-export" class="setting-btn">导出存档</button>
+                            <button id="btn-import" class="setting-btn">导入存档</button>
+                            <button id="btn-delete" class="setting-btn danger">删除存档</button>
+                        </div>
+                        <textarea id="save-data-area" placeholder="存档数据将显示在这里..." rows="6"></textarea>
+                    </div>
+                    <div class="settings-section">
+                        <h3>📊 游戏统计</h3>
+                        <div id="game-stats"></div>
+                    </div>
+
+                    <div class="settings-disclaimer">
+                        <p>本游戏由 AI 辅助生成，仅用于学习交流与技术演示，不用于任何商业用途。</p>
+                        <p>“宝可梦 / Pokémon”及相关角色、名称、图像与设定的著作权、商标权等知识产权归原权利人所有（如 Nintendo、Game Freak、Creatures 及 The Pokémon Company）。</p>
+                        <p>如有侵权或不当使用，请联系删除或更正。</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 底部导航 -->
+        <nav id="tab-nav">
+            <button class="tab-btn active" data-tab="tab-battle"><span class="tab-icon">⚔️</span><span class="tab-label">战斗</span></button>
+            <button class="tab-btn" data-tab="tab-map"><span class="tab-icon">🗺️</span><span class="tab-label">地图</span></button>
+            <button class="tab-btn badge-tab-btn" data-tab="tab-badge"><span class="tab-icon">🏅</span><span class="tab-label">徽章</span></button>
+            <button class="tab-btn berry-tab-btn" data-tab="tab-berry"><span class="tab-icon">🌱</span><span class="tab-label">树果</span></button>
+            <button class="tab-btn skill-tab-btn" data-tab="tab-skill"><span class="tab-icon">⚡</span><span class="tab-label">技能</span></button>
+            <button class="tab-btn talent-tab-btn" data-tab="tab-talent"><span class="tab-icon">🌟</span><span class="tab-label">天赋</span></button>
+            <button class="tab-btn tower-tab-btn" data-tab="tab-tower"><span class="tab-icon">🏝️</span><span class="tab-label">挑战</span></button>
+            <button class="tab-btn" data-tab="tab-pokedex"><span class="tab-icon">📖</span><span class="tab-label">图鉴</span></button>
+            <button class="tab-btn" data-tab="tab-settings"><span class="tab-icon">⚙️</span><span class="tab-label">设置</span></button>
+        </nav>
+    </div>
+
+
+    <script src="js/pokemon-data.js"></script>
+    <script src="js/route-data.js"></script>
+    <script src="js/game-config.js"></script>
+    <script src="js/game-core.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
