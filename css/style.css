@@ -2421,21 +2421,21 @@ body {
     }
 
     #enemy-side, #player-side {
-        gap: 6px;
+        gap: 2px;
     }
 
     .pokemon-sprite {
-        width: 140px;
-        height: 140px;
+        width: 130px;
+        height: 130px;
     }
 
     .pokemon-sprite img {
-        width: 140px;
-        height: 140px;
+        width: 130px;
+        height: 130px;
     }
 
     .pokemon-battle-info {
-        width: 220px;
+        width: 210px;
         padding: 4px 6px;
         height: 68px;
     }
