@@ -749,8 +749,9 @@ body {
 .dex-header-actions {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     flex-shrink: 0;
+    flex-wrap: wrap;
 }
 
 /* ============ 信息面板 ============ */
@@ -1421,6 +1422,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
     margin-bottom: 4px;
 }
 
