@@ -803,6 +803,7 @@ class GameCore {
             exp: getExpForLevel(baseData.expGroup, level),
             ivs: ivs,
             isShiny: isShiny,
+            isWild: true,
         };
 
         const stats = this.calculateStats(pokemon);
@@ -829,7 +830,8 @@ class GameCore {
         const shinyBonus = pokemon.isShiny ? 1.2 : 1;
 
         // 树果加成（每个树果+5对应种族值，不含闪光上限255，闪光在封顶后再乘）
-        const berryBonuses = this.getBerryBonuses(pokemon.id);
+        // 只有己方宝可梦才享受树果加成，野生/敌方怪物不计算
+        const berryBonuses = pokemon.isWild ? {} : this.getBerryBonuses(pokemon.id);
 
         const base = {
             hp: Math.floor(Math.min(BERRY_STAT_CAP, baseRaw.hp + (berryBonuses.hp || 0)) * shinyBonus),
@@ -1416,6 +1418,7 @@ class GameCore {
             exp: getExpForLevel(baseData.expGroup, level),
             ivs: ivs,
             isShiny: isShiny,
+            isWild: true,
         };
 
         const stats = this.calculateStats(pokemon);
@@ -3720,6 +3723,7 @@ class GameCore {
                 level: level,
                 ivs: { hp: 31, atk: 31, def: 31, spAtk: 31, spDef: 31, speed: 31 },
                 isShiny: true, // 挑战塔怪物全部闪光
+                isWild: true,  // 敌方不享受玩家树果加成
             });
         }
         return enemies;
