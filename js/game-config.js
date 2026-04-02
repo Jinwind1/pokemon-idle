@@ -396,10 +396,10 @@ const TALENT_DATA = {
         icon: '⚡',
         description: '基于技能等级之和，增加宝可梦全属性百分比',
         maxLevel: 100,
-        perLevel: 0.02,
+        perLevel: 0.0002,
         unit: '%',
         category: 'battle',
-        special: '技能等级之和×每级0.02%',
+        special: '技能等级之和×每级0.0002%',
     },
     gem_attr_boost: {
         id: 'gem_attr_boost',
