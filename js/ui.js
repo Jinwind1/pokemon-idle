@@ -3165,15 +3165,20 @@ class GameUI {
             } else {
                 let html = '';
                 for (let i = 0; i < tower.enemies.length; i++) {
-                    const enemy = tower.enemies[i];
-                    const spriteUrl = `sprites/pokemon/${enemy.id}.png`;
+                    const enemyId = tower.enemies[i];
+                    // 兼容旧存档（对象）和新格式（纯id）
+                    const id = typeof enemyId === 'object' ? enemyId.id : enemyId;
+                    const baseData = POKEMON_DATA[id];
+                    const name = baseData ? baseData.name : `#${id}`;
+                    const level = this.game.getTowerFloorLevel(tower.currentFloor);
+                    const spriteUrl = `sprites/pokemon/${id}.png`;
                     html += `
                         <div class="tower-enemy-card">
                             <div class="tower-enemy-sprite">
-                                <img src="${spriteUrl}" alt="${enemy.name}" onerror="this.style.display='none';this.parentElement.textContent='${enemy.name.slice(0,2)}'">
+                                <img src="${spriteUrl}" alt="${name}" onerror="this.style.display='none';this.parentElement.textContent='${name.slice(0,2)}'">
                             </div>
-                            <div class="tower-enemy-name">${enemy.name}</div>
-                            <div class="tower-enemy-level">Lv.${enemy.level.toLocaleString()}</div>
+                            <div class="tower-enemy-name">${name}</div>
+                            <div class="tower-enemy-level">Lv.${level.toLocaleString()}</div>
                         </div>
                     `;
                 }

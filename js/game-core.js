@@ -3700,11 +3700,10 @@ class GameCore {
         return pool;
     }
 
-    // 生成挑战塔某层的6只敌方宝可梦
+    // 生成挑战塔某层的6只敌方宝可梦ID列表（只存id，不缓存属性）
     generateTowerFloorEnemies(floor) {
         const pool = this._getTowerCandidatePool();
-        const level = this.getTowerFloorLevel(floor);
-        const enemies = [];
+        const enemyIds = [];
         const usedIds = new Set();
 
         for (let i = 0; i < TOWER_ENEMIES_PER_FLOOR; i++) {
@@ -3715,18 +3714,23 @@ class GameCore {
                 attempts++;
             } while (usedIds.has(id) && attempts < 100);
             usedIds.add(id);
-
-            const baseData = POKEMON_DATA[id];
-            enemies.push({
-                id: id,
-                name: baseData.name,
-                level: level,
-                ivs: { hp: 31, atk: 31, def: 31, spAtk: 31, spDef: 31, speed: 31 },
-                isShiny: true, // 挑战塔怪物全部闪光
-                isWild: true,  // 敌方不享受玩家树果加成
-            });
+            enemyIds.push(id);
         }
-        return enemies;
+        return enemyIds;
+    }
+
+    // 根据挑战塔敌人ID实时构建完整宝可梦对象（不缓存，每次战斗实时计算）
+    buildTowerEnemy(pokemonId, floor) {
+        const level = this.getTowerFloorLevel(floor);
+        const baseData = POKEMON_DATA[pokemonId];
+        return {
+            id: pokemonId,
+            name: baseData.name,
+            level: level,
+            ivs: { hp: 31, atk: 31, def: 31, spAtk: 31, spDef: 31, speed: 31 },
+            isShiny: true, // 挑战塔怪物全部闪光
+            isWild: true,  // 敌方不享受玩家树果加成
+        };
     }
 
     // 进入挑战塔（暂停主线战斗，初始化当前层）
@@ -3735,10 +3739,14 @@ class GameCore {
 
         const tower = this.gameState.tower;
 
-        // 如果当前层没有敌人，生成新的
+        // 如果当前层没有敌人，生成新的（只存id列表）
         if (!tower.enemies) {
             tower.enemies = this.generateTowerFloorEnemies(tower.currentFloor);
             tower.currentEnemyIndex = 0;
+        }
+        // 兼容旧存档：如果 enemies 是对象数组，迁移为纯 id 数组
+        if (tower.enemies.length > 0 && typeof tower.enemies[0] === 'object') {
+            tower.enemies = tower.enemies.map(e => e.id);
         }
 
         // 暂停主线战斗
@@ -3768,7 +3776,9 @@ class GameCore {
         const tower = this.gameState.tower;
         if (!tower.enemies || tower.currentEnemyIndex >= tower.enemies.length) return;
 
-        const enemy = tower.enemies[tower.currentEnemyIndex];
+        // 从 id 实时构建敌方宝可梦（不缓存属性，确保实时计算）
+        const enemyId = tower.enemies[tower.currentEnemyIndex];
+        const enemy = this.buildTowerEnemy(enemyId, tower.currentFloor);
         const enemyStats = this.calculateStats(enemy);
 
         // 自动更换最优宝可梦出战（与主线战斗一致）
