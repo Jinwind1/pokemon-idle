@@ -1263,6 +1263,33 @@ body {
     font-weight: bold;
 }
 
+/* 图鉴搜索框 */
+#pokedex-search-bar {
+    margin: 8px 0;
+}
+
+#pokedex-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    box-sizing: border-box;
+}
+
+#pokedex-search-input:focus {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+#pokedex-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
 #pokedex-grid {
     display: flex;
     flex-direction: column;

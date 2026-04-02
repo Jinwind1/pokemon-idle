@@ -100,6 +100,19 @@ class GameUI {
             });
         });
 
+        // 图鉴搜索框
+        const searchInput = document.getElementById('pokedex-search-input');
+        if (searchInput) {
+            let searchTimer = null;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(() => {
+                    this.pokedexSearchQuery = searchInput.value.trim();
+                    this.renderPokedex();
+                }, 200);
+            });
+        }
+
         // 设置按钮
         document.getElementById('btn-save').addEventListener('click', () => {
             this.game.save();
@@ -1106,6 +1119,19 @@ class GameUI {
             allIds = allIds.filter(id => id >= 810 && id <= 905);
         } else if (this.pokedexRegionFilter === 'paldea') {
             allIds = allIds.filter(id => id >= 906 && id <= 1025);
+        }
+
+        // 搜索过滤
+        if (this.pokedexSearchQuery) {
+            const query = this.pokedexSearchQuery.toLowerCase();
+            allIds = allIds.filter(id => {
+                const data = POKEMON_DATA[id];
+                if (!data) return false;
+                // 匹配名称或编号
+                if (data.name && data.name.toLowerCase().includes(query)) return true;
+                if (String(id).includes(query)) return true;
+                return false;
+            });
         }
 
         // 过滤

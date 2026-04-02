@@ -18,7 +18,7 @@
     <div id="app">
         <!-- 顶部状态栏 -->
         <header id="header">
-            <h1>宝可梦收集放置 <span class="version-tag">v2.00</span></h1>
+            <h1>宝可梦收集放置 <span class="version-tag">v2.05</span></h1>
             <span class="author-tag">by: jinwind</span>
         </header>
 
@@ -274,6 +274,9 @@
                         <button class="sub-filter-btn" data-sort="potential">潜力排序</button>
                         <button class="sub-filter-btn" data-sort="level">等级排序</button>
                     </div>
+                    <div id="pokedex-search-bar">
+                        <input type="text" id="pokedex-search-input" placeholder="🔍 搜索宝可梦名称或编号..." autocomplete="off">
+                    </div>
                     <div id="pokedex-grid"></div>
                 </div>
             </div>
@@ -361,11 +364,12 @@
                         <h3>📝 版本更新记录</h3>
                         <div id="changelog" class="changelog">
                             <div class="changelog-item">
-                                <div class="changelog-version">v2.00 <span class="changelog-date">2026-04-02</span></div>
+                                <div class="changelog-version">v2.05 <span class="changelog-date">2026-04-02</span></div>
                                 <ul class="changelog-list">
                                     <li>🐛 修复喂食树果后野生怪物和挑战塔敌人也享受树果种族值加成的bug</li>
                                     <li>🔧 重构挑战塔敌人存储：只保存ID列表，战斗时实时计算属性（减小存档体积+彻底修复缓存属性问题）</li>
                                     <li>🎨 修复手机端宝石悬浮面板偏出屏幕的问题，触摸设备居中显示（用hover:none判断，不影响PC窄窗口）</li>
+                                    <li>✨ 图鉴新增搜索框，支持按名称或编号搜索宝可梦</li>
                                 </ul>
                             </div>
                             <div class="changelog-item">
