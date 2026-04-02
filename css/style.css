@@ -3059,8 +3059,8 @@ body {
     pointer-events: auto;
 }
 
-/* 手机端：宝石面板固定居中显示 */
-@media (max-width: 500px) {
+/* 触摸设备（无hover能力）：宝石面板固定居中显示 */
+@media (hover: none) {
     .gem-hover-panel {
         position: fixed;
         left: 50% !important;
