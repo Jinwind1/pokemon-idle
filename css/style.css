@@ -3059,6 +3059,34 @@ body {
     pointer-events: auto;
 }
 
+/* 手机端：宝石面板固定居中显示 */
+@media (max-width: 500px) {
+    .gem-hover-panel {
+        position: fixed;
+        left: 50% !important;
+        right: auto !important;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 280px;
+        max-width: calc(100vw - 32px);
+        z-index: 10000;
+    }
+
+    .gem-card:hover .gem-hover-panel,
+    .gem-card:focus-within .gem-hover-panel {
+        transform: translate(-50%, -50%);
+    }
+
+    .gem-card.active .gem-hover-panel {
+        transform: translate(-50%, -50%);
+    }
+
+    .gem-card.align-right .gem-hover-panel {
+        left: 50% !important;
+        right: auto !important;
+    }
+}
+
 .gem-attrs {
     display: flex;
     flex-direction: column;
