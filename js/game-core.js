@@ -3506,7 +3506,7 @@ class GameCore {
         const talentLevel = this.getTalentLevel('skill_stat_bonus');
         if (talentLevel <= 0) return 0;
         const skillSum = this.getSkillLevelSum();
-        return skillSum * talentLevel * 0.02;
+        return skillSum * talentLevel * 0.0002;
     }
 
     // ===================== 树果系统 =====================
