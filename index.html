@@ -18,7 +18,7 @@
     <div id="app">
         <!-- 顶部状态栏 -->
         <header id="header">
-            <h1>宝可梦收集放置 <span class="version-tag">v2.13</span></h1>
+            <h1>宝可梦收集放置 <span class="version-tag">v2.33</span></h1>
             <span class="author-tag">by: jinwind</span>
         </header>
 
@@ -311,6 +311,7 @@
                             <label class="setting-radio"><input type="radio" name="route-switch-condition" value="6v_shiny"> ✨ 全部6V且闪光后切换</label>
                             <label class="setting-radio"><input type="radio" name="route-switch-condition" value="6v_only"> 🎯 全部6V后切换</label>
                         </div>
+                        <button id="btn-upgrade-all-skills" class="setting-btn" style="display:none; margin-top: 12px;">⚡ 一键升级技能</button>
                     </div>
                     <div class="settings-section gameplay-entry">
                         <h3>📘 游戏玩法说明</h3>
@@ -365,9 +366,10 @@
                         <h3>📝 版本更新记录</h3>
                         <div id="changelog" class="changelog">
                             <div class="changelog-item">
-                                <div class="changelog-version">v2.23 <span class="changelog-date">2026-04-03</span></div>
+                                <div class="changelog-version">v2.33 <span class="changelog-date">2026-04-03</span></div>
                                 <ul class="changelog-list">
                                     <li>✨ 宝石商店新增"一键购买并合成永恒"按钮：自动循环购买+合成直到出现永恒宝石（需帕底亚徽章解锁）</li>
+                                    <li>✨ 设置-游戏选项新增"一键升级技能"按钮：批量升级所有达到1000级的宝可梦技能（需解锁技能系统后显示）</li>
                                 </ul>
                             </div>
                             <div class="changelog-item">

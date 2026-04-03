@@ -3461,6 +3461,78 @@ class GameCore {
         };
     }
 
+    // 一键升级所有可升级技能的宝可梦
+    upgradeAllSkills() {
+        if (!this.isSkillUnlocked()) return { success: false, message: '技能系统尚未解锁' };
+
+        const results = [];
+        for (const pokemonId in this.gameState.caughtPokemon) {
+            const storedData = this.gameState.caughtPokemon[pokemonId];
+            if (!storedData) continue;
+
+            const currentSkillLevel = storedData.skillLevel || 0;
+            if (currentSkillLevel >= MAX_SKILL_LEVEL) continue;
+            if (storedData.level < SKILL_LEVEL_REQUIREMENT) continue;
+
+            const baseData = POKEMON_DATA[pokemonId];
+            if (!baseData) continue;
+
+            const oldLevel = storedData.level;
+
+            // 计算超过1000级的经验返还
+            let returnExp = 0;
+            if (oldLevel > SKILL_LEVEL_REQUIREMENT) {
+                const expAt1000 = getExpForLevel(baseData.expGroup, SKILL_LEVEL_REQUIREMENT);
+                returnExp = Math.max(0, storedData.exp - expAt1000);
+            }
+
+            // 重置等级为1，经验为返还经验
+            storedData.level = 1;
+            storedData.exp = returnExp;
+            storedData.skillLevel = currentSkillLevel + 1;
+
+            // 根据返还经验重新计算等级
+            while (storedData.level < MAX_POKEMON_LEVEL) {
+                const nextLevelExp = getExpForLevel(baseData.expGroup, storedData.level + 1);
+                if (storedData.exp >= nextLevelExp) {
+                    storedData.level++;
+                } else {
+                    break;
+                }
+            }
+
+            // 检查进化
+            this.checkEvolution(pokemonId);
+
+            // 如果在队伍中，刷新战斗状态
+            const teamIndex = this.gameState.team.indexOf(pokemonId);
+            if (teamIndex !== -1 && this.currentBattle) {
+                const newPlayerStats = this.calculateBattleStats(this.gameState.activePokemonIndex);
+                if (newPlayerStats && teamIndex === this.gameState.activePokemonIndex) {
+                    this.currentBattle.playerStats = newPlayerStats;
+                    this.currentBattle.playerMaxHp = newPlayerStats.hp;
+                    this.currentBattle.playerCurrentHp = newPlayerStats.hp;
+                    this.currentBattle.playerNextAttack = this.getAttackInterval(newPlayerStats.speed);
+                }
+            }
+
+            results.push({
+                id: pokemonId,
+                name: baseData.name,
+                newSkillLevel: storedData.skillLevel,
+                newLevel: storedData.level,
+                oldLevel: oldLevel,
+            });
+        }
+
+        if (results.length === 0) {
+            return { success: false, message: '没有可升级技能的宝可梦（需要等级≥1000且技能未满级）' };
+        }
+
+        this.save();
+        return { success: true, count: results.length, results };
+    }
+
     // ===================== 天赋系统 =====================
     // 检查天赋系统是否解锁（阿罗拉地区通关）
     isTalentUnlocked() {

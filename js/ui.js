@@ -183,6 +183,9 @@ class GameUI {
         // 自动切换地图设置（直接开放）
         this._initAutoRouteSetting();
 
+        // 一键升级技能按钮
+        this._initUpgradeAllSkillsBtn();
+
         // 主题颜色切换
         this._initTheme();
         document.querySelectorAll('.theme-color-btn').forEach(btn => {
@@ -914,6 +917,37 @@ class GameUI {
         if (!group) return;
         const autoSwitch = !!this.game.gameState.settings?.autoRouteSwitch;
         group.style.display = autoSwitch ? '' : 'none';
+    }
+
+    // 一键升级技能按钮初始化
+    _initUpgradeAllSkillsBtn() {
+        const btn = document.getElementById('btn-upgrade-all-skills');
+        if (!btn) return;
+        btn.addEventListener('click', () => {
+            this.showConfirmDialog(
+                '一键升级技能',
+                '将遍历所有已捕获的宝可梦，把达到1000级且技能未满级的全部升级一次技能。<br>⚠️ 升级后等级将重置为1（超过1000级的经验会返还），确定继续吗？',
+                () => {
+                    const result = this.game.upgradeAllSkills();
+                    if (result.success) {
+                        const names = result.results.slice(0, 5).map(r => `${r.name}→Lv.${r.newSkillLevel}`).join('、');
+                        const more = result.count > 5 ? `…等${result.count}只` : '';
+                        this.showToast(`⚡ 成功升级 ${result.count} 只宝可梦的技能！\n${names}${more}`);
+                        this.renderPokedex();
+                        this.renderTeam();
+                    } else {
+                        this.showToast('⚠️ ' + result.message);
+                    }
+                }
+            );
+        });
+    }
+
+    // 同步一键升级技能按钮可见性
+    _syncUpgradeAllSkillsBtnVisibility() {
+        const btn = document.getElementById('btn-upgrade-all-skills');
+        if (!btn) return;
+        btn.style.display = this.game.isSkillUnlocked() ? '' : 'none';
     }
 
     // 显示自动切换地图设置（直接开放）
@@ -1827,6 +1861,9 @@ class GameUI {
         const savedCondition = this.game.gameState.settings?.routeSwitchCondition || '6v_shiny';
         const condRadios = document.querySelectorAll('input[name="route-switch-condition"]');
         condRadios.forEach(r => { r.checked = r.value === savedCondition; });
+
+        // 同步一键升级技能按钮可见性
+        this._syncUpgradeAllSkillsBtnVisibility();
     }
 
     // 渲染出战宝可梦属性来源分析（调用独立的 getStatSources，不影响高频战斗计算）
