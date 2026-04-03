@@ -2925,6 +2925,19 @@ body {
     box-shadow: 0 2px 12px rgba(165, 105, 189, 0.5);
 }
 
+.gem-synthesis-btn.eternal {
+    background: linear-gradient(135deg, #00d2ff, #0099cc);
+    color: #fff;
+    font-weight: bold;
+    border-color: rgba(0, 210, 255, 0.5);
+    box-shadow: 0 2px 8px rgba(0, 210, 255, 0.3);
+}
+
+.gem-synthesis-btn.eternal:hover {
+    background: linear-gradient(135deg, #33dbff, #00b8e6);
+    box-shadow: 0 2px 12px rgba(0, 210, 255, 0.5);
+}
+
 .shop-buy-btn {
     padding: 10px 20px;
     font-size: 14px;

@@ -2699,6 +2699,39 @@ class GameUI {
                 this.showReforgeDialog();
             });
         }
+
+        // 一键购买合成到永恒宝石按钮（帕底亚徽章解锁后显示）
+        const autoEternalBtn = document.getElementById('btn-auto-eternal');
+        if (autoEternalBtn) {
+            const paldeaUnlocked = this.game.hasBadge('paldea');
+            autoEternalBtn.style.display = paldeaUnlocked ? '' : 'none';
+            if (paldeaUnlocked) {
+                const newAutoBtn = autoEternalBtn.cloneNode(true);
+                autoEternalBtn.parentNode.replaceChild(newAutoBtn, autoEternalBtn);
+                newAutoBtn.addEventListener('click', () => {
+                    if (this.game.gameState.gold < 1000) {
+                        this.showToast('⚠️ 金币不足');
+                        return;
+                    }
+                    this.showConfirmDialog(
+                        '一键购买并合成永恒宝石',
+                        '将自动循环购买宝石并合成，直到产生新的永恒宝石或金币耗尽。<br>⚠️ 可能消耗大量金币，确定继续吗？',
+                        () => {
+                            const result = this.game.autoBuyAndSynthesizeToEternal();
+                            if (result.success) {
+                                const reasonText = result.reason === 'eternal_found'
+                                    ? `✨ 成功获得 ${result.newEternals} 颗永恒宝石！`
+                                    : (result.reason === 'gold_empty' ? '金币已耗尽' : '背包已满且无法继续合成');
+                                this.showToast(`💎 ${reasonText}\n购买 ${result.bought} 颗，花费 ${result.spent.toLocaleString()} 金币，合成 ${result.synthesized} 次`);
+                                this.renderBadgePage();
+                            } else {
+                                this.showToast('⚠️ ' + result.message);
+                            }
+                        }
+                    );
+                });
+            }
+        }
     }
 
     showGemSynthesisDialog(sourceQuality, targetQuality) {
