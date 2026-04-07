@@ -812,10 +812,12 @@ class GameCore {
         return pokemon;
     }
 
+    _uidCounter = 0;
+
     generateUID() {
-        // 使用原生UUID保证唯一性（旧方案Date.now()+随机数在批量购买时会碰撞）
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
-        return Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 8);
+        // 自增计数器 + 短随机后缀，速度远快于 crypto.randomUUID()
+        // 足以保证游戏内唯一性（计数器保证不碰撞，随机防止时序猜测）
+        return 'g' + (++this._uidCounter).toString(36) + Math.random().toString(36).substr(2, 5);
     }
 
     // 迁移修复：旧版 generateUID 批量购买时产生重复uid，导致合成失败
