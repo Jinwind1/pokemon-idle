@@ -3138,6 +3138,7 @@ class GameCore {
         const qualityOrder = ['common', 'magic', 'rare', 'epic', 'mythic', 'legendary']; // 从低到高合成
         let totalSynthesized = 0;
         const results = []; // 记录每次合成结果
+        let lastError = null;
 
         // 从最低品质开始，逐级向上合成
         for (const sourceQuality of qualityOrder) {
@@ -3153,15 +3154,20 @@ class GameCore {
                 const toMerge = candidates.slice(0, 10);
                 const uids = toMerge.map(g => g.uid);
 
-                const result = this.synthesizeGems(sourceQuality, uids);
-                if (!result.success) break;
-
-                totalSynthesized++;
-                results.push({
-                    sourceQuality: sourceQuality,
-                    targetQuality: targetQuality,
-                    newGem: result.newGem,
-                });
+                try {
+                    const result = this.synthesizeGems(sourceQuality, uids);
+                    if (!result.success) { lastError = result.message; break; }
+                    totalSynthesized++;
+                    results.push({
+                        sourceQuality: sourceQuality,
+                        targetQuality: targetQuality,
+                        newGem: result.newGem,
+                    });
+                } catch (e) {
+                    lastError = '异常: ' + e.message;
+                    console.error('synthesizeAllGems error:', e);
+                    break;
+                }
             }
         }
 
@@ -3173,7 +3179,7 @@ class GameCore {
                 const unlocked = this.gameState.gems.filter(g => g.quality === q && !g.locked).length;
                 return `${qualityNames[q]}:${unlocked}/${total}`;
             }).join(' | ');
-            return { success: false, message: `没有足够的宝石可以合成（需要同品质10个未锁定）。当前：${diag}` };
+            return { success: false, message: `没有足够的宝石可以合成（需要同品质10个未锁定）。当前：${diag}${lastError ? ' | 错误:' + lastError : ''}` };
         }
 
         return { success: true, count: totalSynthesized, results };
