@@ -813,7 +813,25 @@ class GameCore {
     }
 
     generateUID() {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        // 使用原生UUID保证唯一性（旧方案Date.now()+随机数在批量购买时会碰撞）
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+        return Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 8);
+    }
+
+    // 迁移修复：旧版 generateUID 批量购买时产生重复uid，导致合成失败
+    _migrateFixGemUids() {
+        if (!this.gameState?.gems?.length) return;
+        const uidMap = new Map(); // oldUid -> newUid
+        let fixed = 0;
+        for (const gem of this.gameState.gems) {
+            if (uidMap.has(gem.uid)) {
+                gem.uid = this.generateUID();
+                fixed++;
+            } else {
+                uidMap.set(gem.uid, true);
+            }
+        }
+        if (fixed > 0) console.log(`[迁移] 修复了 ${fixed} 个重复宝石UID`);
     }
 
     // ===================== 属性计算（简化公式） =====================
@@ -2744,6 +2762,8 @@ class GameCore {
             }
 
             this.gameState = data;
+            // 迁移修复：宝石重复uid（旧generateUID方案批量购买时碰撞）
+            this._migrateFixGemUids();
             this.save();
             return true;
         } catch (e) {
