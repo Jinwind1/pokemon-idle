@@ -2709,6 +2709,13 @@ class GameCore {
                 if (!Array.isArray(parsed.berryPlots)) parsed.berryPlots = [];
                 if (!parsed.berryBag) parsed.berryBag = {};
                 if (!parsed.berryFed) parsed.berryFed = {};
+                // 树果种植迁移：旧存档的种植记录没有growTime，补上
+                if (Array.isArray(parsed.berryPlots)) {
+                    const defaultGrowTime = BERRY_GROW_TIME; // 用默认值回填
+                    for (const plot of parsed.berryPlots) {
+                        if (!plot.growTime) plot.growTime = defaultGrowTime;
+                    }
+                }
                 // 技能系统兼容：为旧存档的宝可梦补充skillLevel字段
                 if (parsed.caughtPokemon) {
                     for (const id in parsed.caughtPokemon) {
@@ -3737,7 +3744,7 @@ class GameCore {
             return { success: false, message: `金币不足，购买种子需要 ${BERRY_SEED_PRICE.toLocaleString()} 金币` };
         }
         this.gameState.gold -= BERRY_SEED_PRICE;
-        this.gameState.berryPlots.push({ berryId, plantedAt: Date.now() });
+        this.gameState.berryPlots.push({ berryId, plantedAt: Date.now(), growTime: this.getEffectiveBerryGrowTime() });
         this.save();
         return { success: true };
     }
@@ -3747,7 +3754,7 @@ class GameCore {
         if (!this.isBerryUnlocked()) return { success: false, message: '树果系统尚未解锁' };
         if (!BERRY_DATA[berryId]) return { success: false, message: '无效的树果类型' };
         if (this.gameState.berryPlots.length >= BERRY_PLOT_MAX) return { success: false, message: '没有空地了' };
-        this.gameState.berryPlots.push({ berryId, plantedAt: Date.now() });
+        this.gameState.berryPlots.push({ berryId, plantedAt: Date.now(), growTime: this.getEffectiveBerryGrowTime() });
         this.save();
         return { success: true };
     }
@@ -3768,19 +3775,21 @@ class GameCore {
         return growTime;
     }
 
-    // 检查某个种植槽是否成熟
+    // 检查某个种植槽是否成熟（使用种植时锁定的成熟时间）
     isBerryRipe(plotIndex) {
         const plot = this.gameState.berryPlots[plotIndex];
         if (!plot) return false;
-        return (Date.now() - plot.plantedAt) >= this.getEffectiveBerryGrowTime();
+        const growTime = plot.growTime || this.getEffectiveBerryGrowTime(); // 旧存档回退
+        return (Date.now() - plot.plantedAt) >= growTime;
     }
 
-    // 获取种植槽剩余时间（毫秒）
+    // 获取种植槽剩余时间（毫秒）— 使用种植时锁定的成熟时间
     getBerryTimeLeft(plotIndex) {
         const plot = this.gameState.berryPlots[plotIndex];
         if (!plot) return 0;
         const elapsed = Date.now() - plot.plantedAt;
-        return Math.max(0, this.getEffectiveBerryGrowTime() - elapsed);
+        const growTime = plot.growTime || this.getEffectiveBerryGrowTime(); // 旧存档无growTime则回退实时计算
+        return Math.max(0, growTime - elapsed);
     }
 
     // 采摘树果（收获到背包）
