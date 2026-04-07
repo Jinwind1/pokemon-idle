@@ -815,9 +815,9 @@ class GameCore {
     _uidCounter = 0;
 
     generateUID() {
-        // 自增计数器 + 短随机后缀，速度远快于 crypto.randomUUID()
-        // 足以保证游戏内唯一性（计数器保证不碰撞，随机防止时序猜测）
-        return 'g' + (++this._uidCounter).toString(36) + Math.random().toString(36).substr(2, 5);
+        // 时间戳 + 自增计数器，兼顾速度与唯一性
+        // 时间戳前缀保证不同会话不碰撞，自增后缀保证同批次不重复
+        return Date.now().toString(36) + '_' + (++this._uidCounter).toString(36);
     }
 
     // 迁移修复：旧版 generateUID 批量购买时产生重复uid，导致合成失败
