@@ -3195,45 +3195,77 @@ class GameCore {
     }
 
     // 一键合成：从低到高依次合成所有能合成的宝石
-    synthesizeAllGems() {
-        const qualityOrder = ['common', 'magic', 'rare', 'epic', 'mythic', 'legendary']; // 从低到高合成
+    // skipSave=true 时跳过每次合成的单独存档（用于自动合成永恒场景，由调用方统一存档）
+    synthesizeAllGems(skipSave = false) {
+        const qualityOrder = ['common', 'magic', 'rare', 'epic', 'mythic', 'legendary'];
         let totalSynthesized = 0;
-        const results = []; // 记录每次合成结果
+        const results = [];
         let lastError = null;
 
-        // 从最低品质开始，逐级向上合成
-        for (const sourceQuality of qualityOrder) {
-            const targetQuality = this.getNextGemQualityId(sourceQuality);
-            if (!targetQuality) continue;
+        if (skipSave) {
+            // === 快速模式：内联合成逻辑，跳过冗余验证和逐次save ===
+            // 按品质预分组，避免反复 filter
+            const groups = {};
+            for (const q of qualityOrder) groups[q] = [];
+            for (const g of this.gameState.gems) {
+                if (!g.locked && groups[g.quality]) groups[g.quality].push(g);
+            }
 
-            // 反复合成同一品质，直到不够10个
-            while (true) {
-                const candidates = this.gameState.gems.filter(g => g.quality === sourceQuality && !g.locked);
-                if (candidates.length < 10) break;
+            for (const sourceQuality of qualityOrder) {
+                const targetQuality = this.getNextGemQualityId(sourceQuality);
+                if (!targetQuality) continue;
 
-                // 取前10个进行合成
-                const toMerge = candidates.slice(0, 10);
-                const uids = toMerge.map(g => g.uid);
-
-                try {
-                    const result = this.synthesizeGems(sourceQuality, uids);
-                    if (!result.success) { lastError = result.message; break; }
+                let candidates = groups[sourceQuality];
+                while (candidates.length >= 10) {
+                    // 取前10个的uid集合
+                    const toRemove = new Set(candidates.slice(0, 10).map(g => g.uid));
+                    // 从gems数组中移除
+                    this.gameState.gems = this.gameState.gems.filter(g => !toRemove.has(g.uid));
+                    // 生成新宝石
+                    const newGem = this.generateGemByQuality(targetQuality);
+                    if (!newGem) { lastError = '生成目标品质宝石失败'; break; }
+                    newGem.isNew = true;
+                    this.gameState.gems.push(newGem);
                     totalSynthesized++;
-                    results.push({
-                        sourceQuality: sourceQuality,
-                        targetQuality: targetQuality,
-                        newGem: result.newGem,
-                    });
-                } catch (e) {
-                    lastError = '异常: ' + e.message;
-                    console.error('synthesizeAllGems error:', e);
-                    break;
+                    results.push({ sourceQuality, targetQuality, newGem });
+                    // 更新分组：移除已消耗的10个，新宝石加入目标组
+                    candidates = candidates.slice(10);
+                    groups[sourceQuality] = candidates;
+                    if (!newGem.locked && groups[targetQuality]) groups[targetQuality].push(newGem);
+                }
+            }
+        } else {
+            // === 普通模式：保持原有逻辑（UI手动合成用） ===
+            for (const sourceQuality of qualityOrder) {
+                const targetQuality = this.getNextGemQualityId(sourceQuality);
+                if (!targetQuality) continue;
+
+                while (true) {
+                    const candidates = this.gameState.gems.filter(g => g.quality === sourceQuality && !g.locked);
+                    if (candidates.length < 10) break;
+
+                    const toMerge = candidates.slice(0, 10);
+                    const uids = toMerge.map(g => g.uid);
+
+                    try {
+                        const result = this.synthesizeGems(sourceQuality, uids);
+                        if (!result.success) { lastError = result.message; break; }
+                        totalSynthesized++;
+                        results.push({
+                            sourceQuality: sourceQuality,
+                            targetQuality: targetQuality,
+                            newGem: result.newGem,
+                        });
+                    } catch (e) {
+                        lastError = '异常: ' + e.message;
+                        console.error('synthesizeAllGems error:', e);
+                        break;
+                    }
                 }
             }
         }
 
         if (totalSynthesized === 0) {
-            // 详细诊断：统计各品质的可用/锁定数量
             const qualityNames = { common: '普通', magic: '魔法', rare: '稀有', epic: '史诗', mythic: '神话', legendary: '传说' };
             const diag = qualityOrder.map(q => {
                 const total = this.gameState.gems.filter(g => g.quality === q).length;
@@ -3296,14 +3328,24 @@ class GameCore {
             s.totalSpent += buyCount * price;
         }
 
-        // 步骤2：一键合成
-        const synthResult = this.synthesizeAllGems();
+        // 步骤2：一键合成（快速模式：跳过冗余验证和逐次save）
+        const synthResult = this.synthesizeAllGems(true);
         if (synthResult.success) {
             s.totalSynthesized += synthResult.count;
         }
 
+        // 用 Map 一次遍历统计品质计数（替代多次 filter）
+        const qualityCounts = {};
+        let currentEternalCount = 0;
+        for (const g of this.gameState.gems) {
+            if (g.quality === 'eternal') {
+                currentEternalCount++;
+            } else if (!g.locked) {
+                qualityCounts[g.quality] = (qualityCounts[g.quality] || 0) + 1;
+            }
+        }
+
         // 检查是否产生了新的永恒宝石
-        const currentEternalCount = this.gameState.gems.filter(g => g.quality === 'eternal').length;
         if (currentEternalCount > s.startEternalCount) {
             const newEternalCount = currentEternalCount - s.startEternalCount;
             this.save();
@@ -3311,13 +3353,9 @@ class GameCore {
             return { done: true, reason: 'eternal_found', newEternals: newEternalCount, ...this._getAutoEternalResult('eternal_found', newEternalCount) };
         }
 
-        // 检查是否还能继续
+        // 检查是否还能继续（用 Map 计数判断，O(n)→O(1)）
         const canBuyMore = this.gameState.gold >= price && this.gameState.gems.length < GEM_BAG_MAX;
-        const canSynthMore = this.gameState.gems.some(g => {
-            if (g.locked) return false;
-            const sameQuality = this.gameState.gems.filter(x => x.quality === g.quality && !x.locked).length;
-            return sameQuality >= 10 && g.quality !== 'eternal';
-        });
+        const canSynthMore = Object.values(qualityCounts).some(count => count >= 10);
 
         if (!canBuyMore && !canSynthMore) {
             this.save();
