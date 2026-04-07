@@ -2713,54 +2713,53 @@ class GameCore {
             }
 
             const parsed = JSON.parse(data);
-                // 验证数据完整性
-                if (!parsed || !parsed.team || !Array.isArray(parsed.team) || parsed.team.length === 0) {
-                    console.warn('存档数据不完整，将重新开始');
-                    return false;
-                }
+            // 验证数据完整性
+            if (!parsed || !parsed.team || !Array.isArray(parsed.team) || parsed.team.length === 0) {
+                console.warn('存档数据不完整，将重新开始');
+                return false;
+            }
 
-                // 确保所有必要字段存在
-                if (typeof parsed.activePokemonIndex !== 'number') parsed.activePokemonIndex = 0;
-                if (!parsed.pokedex) parsed.pokedex = {};
-                if (!parsed.caughtPokemon) parsed.caughtPokemon = {};
-                if (!parsed.currentRegion) parsed.currentRegion = 'kanto';
-                if (!parsed.currentRoute) parsed.currentRoute = 'kanto_route1';
-                if (!parsed.stats) parsed.stats = { totalBattles: 0, totalCatches: 0, totalExp: 0, totalGold: 0, playTime: 0 };
-                if (!parsed.settings) parsed.settings = {};
-                if (!parsed.shinyDex) parsed.shinyDex = {};
-                if (!parsed.pokedexDisplay) parsed.pokedexDisplay = {};
-                if (typeof parsed.gold !== 'number') parsed.gold = 0;
-                if (!parsed.badges) parsed.badges = {};
-                if (!Array.isArray(parsed.gems)) parsed.gems = [];
-                if (!parsed.stats.totalGold) parsed.stats.totalGold = 0;
-                // 树果系统兼容
-                if (!Array.isArray(parsed.berryPlots)) parsed.berryPlots = [];
-                if (!parsed.berryBag) parsed.berryBag = {};
-                if (!parsed.berryFed) parsed.berryFed = {};
-                // 技能系统兼容：为旧存档的宝可梦补充skillLevel字段
-                if (parsed.caughtPokemon) {
-                    for (const id in parsed.caughtPokemon) {
-                        if (typeof parsed.caughtPokemon[id].skillLevel !== 'number') {
-                            parsed.caughtPokemon[id].skillLevel = 0;
-                        }
+            // 确保所有必要字段存在
+            if (typeof parsed.activePokemonIndex !== 'number') parsed.activePokemonIndex = 0;
+            if (!parsed.pokedex) parsed.pokedex = {};
+            if (!parsed.caughtPokemon) parsed.caughtPokemon = {};
+            if (!parsed.currentRegion) parsed.currentRegion = 'kanto';
+            if (!parsed.currentRoute) parsed.currentRoute = 'kanto_route1';
+            if (!parsed.stats) parsed.stats = { totalBattles: 0, totalCatches: 0, totalExp: 0, totalGold: 0, playTime: 0 };
+            if (!parsed.settings) parsed.settings = {};
+            if (!parsed.shinyDex) parsed.shinyDex = {};
+            if (!parsed.pokedexDisplay) parsed.pokedexDisplay = {};
+            if (typeof parsed.gold !== 'number') parsed.gold = 0;
+            if (!parsed.badges) parsed.badges = {};
+            if (!Array.isArray(parsed.gems)) parsed.gems = [];
+            if (!parsed.stats.totalGold) parsed.stats.totalGold = 0;
+            // 树果系统兼容
+            if (!Array.isArray(parsed.berryPlots)) parsed.berryPlots = [];
+            if (!parsed.berryBag) parsed.berryBag = {};
+            if (!parsed.berryFed) parsed.berryFed = {};
+            // 技能系统兼容：为旧存档的宝可梦补充skillLevel字段
+            if (parsed.caughtPokemon) {
+                for (const id in parsed.caughtPokemon) {
+                    if (typeof parsed.caughtPokemon[id].skillLevel !== 'number') {
+                        parsed.caughtPokemon[id].skillLevel = 0;
                     }
                 }
-                // 天赋系统兼容
-                if (!parsed.talents) parsed.talents = {};
-                // 挑战塔系统兼容
-                if (!parsed.tower) parsed.tower = { currentFloor: 1, highestFloor: 0, enemies: null, currentEnemyIndex: 0, inBattle: false };
-                if (parsed.tower.inBattle) {
-                    // 刷新页面时如果正在挑战中，重置为未挑战状态（不丢失层数进度）
-                    parsed.tower.inBattle = false;
-                }
-                // 确保activePokemonIndex在范围内
-                if (parsed.activePokemonIndex >= parsed.team.length) parsed.activePokemonIndex = 0;
-
-                this.gameState = parsed;
-                // 迁移修复：旧版 generateUID 批量购买时产生重复uid
-                this._migrateFixGemUids();
-                return true;
             }
+            // 天赋系统兼容
+            if (!parsed.talents) parsed.talents = {};
+            // 挑战塔系统兼容
+            if (!parsed.tower) parsed.tower = { currentFloor: 1, highestFloor: 0, enemies: null, currentEnemyIndex: 0, inBattle: false };
+            if (parsed.tower.inBattle) {
+                // 刷新页面时如果正在挑战中，重置为未挑战状态（不丢失层数进度）
+                parsed.tower.inBattle = false;
+            }
+            // 确保activePokemonIndex在范围内
+            if (parsed.activePokemonIndex >= parsed.team.length) parsed.activePokemonIndex = 0;
+
+            this.gameState = parsed;
+            // 迁移修复：旧版 generateUID 批量购买时产生重复uid
+            this._migrateFixGemUids();
+            return true;
         } catch (e) {
             console.error('加载失败:', e);
         }
