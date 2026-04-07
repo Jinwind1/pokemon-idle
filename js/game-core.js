@@ -2729,6 +2729,8 @@ class GameCore {
                 if (parsed.activePokemonIndex >= parsed.team.length) parsed.activePokemonIndex = 0;
 
                 this.gameState = parsed;
+                // 迁移修复：旧版 generateUID 批量购买时产生重复uid
+                this._migrateFixGemUids();
                 return true;
             }
         } catch (e) {
