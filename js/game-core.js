@@ -3166,7 +3166,14 @@ class GameCore {
         }
 
         if (totalSynthesized === 0) {
-            return { success: false, message: '没有足够的宝石可以合成（每种品质至少需要10个未锁定宝石）' };
+            // 详细诊断：统计各品质的可用/锁定数量
+            const qualityNames = { common: '普通', magic: '魔法', rare: '稀有', epic: '史诗', mythic: '神话', legendary: '传说' };
+            const diag = qualityOrder.map(q => {
+                const total = this.gameState.gems.filter(g => g.quality === q).length;
+                const unlocked = this.gameState.gems.filter(g => g.quality === q && !g.locked).length;
+                return `${qualityNames[q]}:${unlocked}/${total}`;
+            }).join(' | ');
+            return { success: false, message: `没有足够的宝石可以合成（需要同品质10个未锁定）。当前：${diag}` };
         }
 
         return { success: true, count: totalSynthesized, results };
