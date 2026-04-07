@@ -2861,11 +2861,11 @@ class GameUI {
         }
         this._autoEternalRunning = true;
 
-        // 创建进度条覆盖层
+        // 创建进度条覆盖层（复用 modal 样式）
         const overlay = document.createElement('div');
-        overlay.className = 'dialog-overlay';
+        overlay.className = 'modal-overlay';
         overlay.innerHTML = `
-            <div class="dialog-box" style="max-width:420px;text-align:center">
+            <div class="modal" style="max-width:420px;text-align:center">
                 <h3>💎 一键购买合成永恒</h3>
                 <div id="eternal-progress-info" style="margin:12px 0;color:var(--text-secondary);font-size:13px;min-height:40px;">
                     正在准备...
