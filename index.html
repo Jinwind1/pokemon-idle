@@ -18,7 +18,7 @@
     <div id="app">
         <!-- 顶部状态栏 -->
         <header id="header">
-            <h1>宝可梦收集放置 <span class="version-tag">v2.35</span></h1>
+            <h1>宝可梦收集放置 <span class="version-tag">v2.45</span></h1>
             <span class="author-tag">by: jinwind</span>
         </header>
 
@@ -366,8 +366,10 @@
                         <h3>📝 版本更新记录</h3>
                         <div id="changelog" class="changelog">
                             <div class="changelog-item">
-                                <div class="changelog-version">v2.35 <span class="changelog-date">2026-04-07</span></div>
+                                <div class="changelog-version">v2.45 <span class="changelog-date">2026-04-07</span></div>
                                 <ul class="changelog-list">
+                                    <li>🚀 重构"一键购买并合成永恒"为异步分批执行：每50轮让出主线程，显示实时进度条和统计信息</li>
+                                    <li>🛑 一键合成永恒新增停止按钮：运行中可随时中断，不再卡死浏览器</li>
                                     <li>🔧 修复树果喂食上限计算：种族值251等不能整除5的情况也能继续吃果子（实际加成仍封顶255）</li>
                                     <li>🔧 修正755号宝可梦名字：甜竹竹→睡睡菇，756号：灿烂甜竹竹→灯罩夜菇</li>
                                 </ul>

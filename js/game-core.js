@@ -3172,90 +3172,108 @@ class GameCore {
         return { success: true, count: totalSynthesized, results };
     }
 
-    // 一键购买合成到永恒宝石：循环（购买填满背包 -> 一键合成），直到产生新的永恒宝石
-    autoBuyAndSynthesizeToEternal() {
-        if (!this.isGoldUnlocked()) return { success: false, message: '尚未解锁金币系统' };
+    // ==================== 一键购买并合成永恒宝石（分步异步）====================
 
+    // 一键合成永恒的运行状态（用于UI进度回调）
+    _autoEternalState = null;
+
+    // 初始化一键合成永恒的状态
+    startAutoEternal() {
+        if (!this.isGoldUnlocked()) return { success: false, message: '尚未解锁金币系统' };
         const price = 1000;
         if (this.gameState.gold < price) return { success: false, message: '金币不足' };
 
-        // 记录开始前的永恒宝石数量
         const startEternalCount = this.gameState.gems.filter(g => g.quality === 'eternal').length;
-        let totalBought = 0;
-        let totalSpent = 0;
-        let totalSynthesized = 0;
-        let rounds = 0;
-        const maxRounds = 10000; // 安全上限防止死循环
+        this._autoEternalState = {
+            running: true,
+            startEternalCount,
+            totalBought: 0,
+            totalSpent: 0,
+            totalSynthesized: 0,
+            rounds: 0,
+            price,
+        };
+        return { success: true };
+    }
 
-        while (rounds < maxRounds) {
-            rounds++;
-
-            // 步骤1：购买填满背包
-            const bagRemain = GEM_BAG_MAX - this.gameState.gems.length;
-            const affordable = Math.floor(this.gameState.gold / price);
-            const buyCount = Math.min(bagRemain, affordable);
-
-            if (buyCount > 0) {
-                for (let i = 0; i < buyCount; i++) {
-                    this.gameState.gold -= price;
-                    const gem = this.generateGem();
-                    gem.isNew = true;
-                    this.gameState.gems.push(gem);
-                }
-                totalBought += buyCount;
-                totalSpent += buyCount * price;
-            }
-
-            // 步骤2：一键合成
-            const synthResult = this.synthesizeAllGems();
-            if (synthResult.success) {
-                totalSynthesized += synthResult.count;
-            }
-
-            // 检查是否产生了新的永恒宝石
-            const currentEternalCount = this.gameState.gems.filter(g => g.quality === 'eternal').length;
-            if (currentEternalCount > startEternalCount) {
-                const newEternalCount = currentEternalCount - startEternalCount;
-                this.save();
-                return {
-                    success: true,
-                    bought: totalBought,
-                    spent: totalSpent,
-                    synthesized: totalSynthesized,
-                    newEternals: newEternalCount,
-                    rounds,
-                    reason: 'eternal_found',
-                };
-            }
-
-            // 检查是否还有金币继续购买（如果背包没空间且合成也不够，就卡住了）
-            const canBuyMore = this.gameState.gold >= price && this.gameState.gems.length < GEM_BAG_MAX;
-            const canSynthMore = this.gameState.gems.some(g => {
-                if (g.locked) return false;
-                const sameQuality = this.gameState.gems.filter(x => x.quality === g.quality && !x.locked).length;
-                return sameQuality >= 10 && g.quality !== 'eternal';
-            });
-
-            if (!canBuyMore && !canSynthMore) {
-                // 无法继续：金币不够且无法合成腾空间
-                break;
-            }
+    // 执行一轮：购买填满背包 + 合成一次。返回本轮结果和累计状态
+    autoBuySynthStep() {
+        if (!this._autoEternalState || !this._autoEternalState.running) {
+            return { done: true, reason: 'stopped', ...this._getAutoEternalResult('stopped') };
         }
 
-        this.save();
+        const s = this._autoEternalState;
+        const price = s.price;
+        s.rounds++;
 
-        if (totalBought === 0 && totalSynthesized === 0) {
-            return { success: false, message: '金币不足或背包已满且无法合成' };
+        // 步骤1：购买填满背包
+        const bagRemain = GEM_BAG_MAX - this.gameState.gems.length;
+        const affordable = Math.floor(this.gameState.gold / price);
+        const buyCount = Math.min(bagRemain, affordable);
+
+        if (buyCount > 0) {
+            for (let i = 0; i < buyCount; i++) {
+                this.gameState.gold -= price;
+                const gem = this.generateGem();
+                gem.isNew = true;
+                this.gameState.gems.push(gem);
+            }
+            s.totalBought += buyCount;
+            s.totalSpent += buyCount * price;
         }
 
+        // 步骤2：一键合成
+        const synthResult = this.synthesizeAllGems();
+        if (synthResult.success) {
+            s.totalSynthesized += synthResult.count;
+        }
+
+        // 检查是否产生了新的永恒宝石
+        const currentEternalCount = this.gameState.gems.filter(g => g.quality === 'eternal').length;
+        if (currentEternalCount > s.startEternalCount) {
+            const newEternalCount = currentEternalCount - s.startEternalCount;
+            this.save();
+            this._autoEternalState.running = false;
+            return { done: true, reason: 'eternal_found', newEternals: newEternalCount, ...this._getAutoEternalResult('eternal_found', newEternalCount) };
+        }
+
+        // 检查是否还能继续
+        const canBuyMore = this.gameState.gold >= price && this.gameState.gems.length < GEM_BAG_MAX;
+        const canSynthMore = this.gameState.gems.some(g => {
+            if (g.locked) return false;
+            const sameQuality = this.gameState.gems.filter(x => x.quality === g.quality && !x.locked).length;
+            return sameQuality >= 10 && g.quality !== 'eternal';
+        });
+
+        if (!canBuyMore && !canSynthMore) {
+            this.save();
+            this._autoEternalState.running = false;
+            const endReason = this.gameState.gold < price ? 'gold_empty' : 'bag_full';
+            return { done: true, reason: endReason, ...this._getAutoEternalResult(endReason) };
+        }
+
+        // 还在继续中
+        return { done: false, rounds: s.rounds, totalBought: s.totalBought, totalSpent: s.totalSpent, totalSynthesized: s.totalSynthesized };
+    }
+
+    // 停止一键合成永恒
+    stopAutoEternal() {
+        if (this._autoEternalState) {
+            this._autoEternalState.running = false;
+        }
+    }
+
+    // 获取最终结果
+    _getAutoEternalResult(reason, newEternals = 0) {
+        const s = this._autoEternalState || {};
         return {
-            success: true,
-            bought: totalBought,
-            spent: totalSpent,
-            synthesized: totalSynthesized,
-            newEternals: 0,
-            rounds,
-            reason: this.gameState.gold < price ? 'gold_empty' : 'bag_full',
+            success: reason !== 'stopped',
+            bought: s.totalBought || 0,
+            spent: s.totalSpent || 0,
+            synthesized: s.totalSynthesized || 0,
+            newEternals,
+            rounds: s.rounds || 0,
+            reason,
         };
     }
     getGemBonuses() {

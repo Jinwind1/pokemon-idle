@@ -2750,20 +2750,16 @@ class GameUI {
                         this.showToast('⚠️ 金币不足');
                         return;
                     }
+                    // 如果正在运行中，忽略重复点击
+                    if (this._autoEternalRunning) {
+                        this.showToast('⏳ 正在运行中...');
+                        return;
+                    }
                     this.showConfirmDialog(
                         '一键购买并合成永恒宝石',
                         '将自动循环购买宝石并合成，直到产生新的永恒宝石或金币耗尽。<br>⚠️ 可能消耗大量金币，确定继续吗？',
                         () => {
-                            const result = this.game.autoBuyAndSynthesizeToEternal();
-                            if (result.success) {
-                                const reasonText = result.reason === 'eternal_found'
-                                    ? `✨ 成功获得 ${result.newEternals} 颗永恒宝石！`
-                                    : (result.reason === 'gold_empty' ? '金币已耗尽' : '背包已满且无法继续合成');
-                                this.showToast(`💎 ${reasonText}\n购买 ${result.bought} 颗，花费 ${result.spent.toLocaleString()} 金币，合成 ${result.synthesized} 次`);
-                                this.renderBadgePage();
-                            } else {
-                                this.showToast('⚠️ ' + result.message);
-                            }
+                            this._startAutoEternalProcess();
                         }
                     );
                 });
@@ -2852,6 +2848,85 @@ class GameUI {
 
         updateSelectedState();
         document.body.appendChild(overlay);
+    }
+
+    // 一键购买并合成永恒宝石 - 异步分批处理
+    _autoEternalRunning = false;
+
+    _startAutoEternalProcess() {
+        const initResult = this.game.startAutoEternal();
+        if (!initResult.success) {
+            this.showToast('⚠️ ' + initResult.message);
+            return;
+        }
+        this._autoEternalRunning = true;
+
+        // 创建进度条覆盖层
+        const overlay = document.createElement('div');
+        overlay.className = 'dialog-overlay';
+        overlay.innerHTML = `
+            <div class="dialog-box" style="max-width:420px;text-align:center">
+                <h3>💎 一键购买合成永恒</h3>
+                <div id="eternal-progress-info" style="margin:12px 0;color:var(--text-secondary);font-size:13px;min-height:40px;">
+                    正在准备...
+                </div>
+                <div style="background:rgba(255,255,255,0.1);border-radius:8px;height:20px;overflow:hidden;margin-bottom:8px;">
+                    <div id="eternal-progress-bar" style="width:0%;height:100%;background:linear-gradient(90deg,#9b59b6,#e74c3c);border-radius:8px;transition:width 0.15s;"></div>
+                </div>
+                <button id="btn-stop-auto-eternal" class="gem-synthesis-btn eternal" style="padding:10px 30px;font-size:15px;">⏹️ 停止</button>
+            </div>`;
+        document.body.appendChild(overlay);
+
+        const infoEl = document.getElementById('eternal-progress-info');
+        const barEl = document.getElementById('eternal-progress-bar');
+        const stopBtn = document.getElementById('btn-stop-auto-eternal');
+
+        stopBtn.addEventListener('click', () => {
+            this.game.stopAutoEternal();
+            stopBtn.disabled = true;
+            stopBtn.textContent = '停止中...';
+        });
+
+        const BATCH_SIZE = 50; // 每批处理轮数
+        let batchCount = 0;
+
+        const runBatch = () => {
+            for (let i = 0; i < BATCH_SIZE; i++) {
+                if (!this._autoEternalRunning) break;
+                batchCount++;
+                const stepResult = this.game.autoBuySynthStep();
+
+                if (stepResult.done) {
+                    this._autoEternalRunning = false;
+                    this._finishAutoEternal(stepResult, infoEl, barEl, stopBtn, overlay);
+                    return;
+                }
+            }
+
+            // 更新进度（还在运行中）
+            if (this._autoEternalRunning) {
+                infoEl.innerHTML = `第 ${batchCount} 轮...<br>已购买 ${stepResult.totalBought} 颗 | 花费 ${stepResult.totalSpent.toLocaleString()} 金币 | 合成 ${stepResult.totalSynthesized} 次`;
+                barEl.style.width = Math.min(100, (batchCount % 500) / 500 * 100) + '%';
+                setTimeout(runBatch, 0); // 让出主线程
+            }
+        };
+
+        setTimeout(runBatch, 0);
+    }
+
+    _finishAutoEternal(result, infoEl, barEl, stopBtn, overlay) {
+        this._autoEternalRunning = false;
+        const reasonText = result.reason === 'eternal_found'
+            ? `<span style="color:#e74c3c">✨ 成功获得 ${result.newEternals} 颗永恒宝石！</span>`
+            : result.reason === 'stopped'
+                ? '<span style="color:#f39c12">⏹️ 已手动停止</span>'
+                : result.reason === 'gold_empty'
+                    ? '💰 金币已耗尽'
+                    : '🎒 背包已满且无法继续合成';
+        infoEl.innerHTML = `${reasonText}<br><small>共购买 ${result.bought} 颗，花费 ${result.spent.toLocaleString()} 金币，合成 ${result.synthesized} 次（${result.rounds} 轮）</small>`;
+        barEl.style.width = '100%';
+        stopBtn.textContent = '完成';
+        stopBtn.onclick = () => { overlay.remove(); this.renderBadgePage(); };
     }
 
     showReforgeDialog() {
