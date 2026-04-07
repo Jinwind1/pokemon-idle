@@ -3792,14 +3792,14 @@ class GameCore {
         return { success: true, fed: currentFed + 1, max: maxForType };
     }
 
-    // 获取某宝可梦某种树果的最大喂食数量：(255 - 原始种族值) / 5
+    // 获取某宝可梦某种树果的最大喂食数量：向上取整，允许最后一个果子部分生效（实际加成仍封顶255）
     getBerryMaxForType(pokemonId, berryId) {
         const berry = BERRY_DATA[berryId];
         if (!berry) return 0;
         const baseStats = POKEMON_DATA[pokemonId]?.baseStats;
         if (!baseStats) return 0;
         const rawStat = baseStats[berry.stat] || 0;
-        return Math.max(0, Math.floor((BERRY_STAT_CAP - rawStat) / BERRY_STAT_BONUS));
+        return Math.max(0, Math.ceil((BERRY_STAT_CAP - rawStat) / BERRY_STAT_BONUS));
     }
 
     // 获取宝可梦的树果加成 { stat: bonusValue }（每个树果+5种族值）
