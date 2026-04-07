@@ -2889,12 +2889,13 @@ class GameUI {
 
         const BATCH_SIZE = 50; // 每批处理轮数
         let batchCount = 0;
+        let stepResult = null;
 
         const runBatch = () => {
             for (let i = 0; i < BATCH_SIZE; i++) {
-                if (!this._autoEternalRunning) break;
+                if (!this._autoEternalRunning) { stepResult = { reason: 'stopped' }; break; }
                 batchCount++;
-                const stepResult = this.game.autoBuySynthStep();
+                stepResult = this.game.autoBuySynthStep();
 
                 if (stepResult.done) {
                     this._autoEternalRunning = false;
@@ -2903,8 +2904,10 @@ class GameUI {
                 }
             }
 
-            // 更新进度（还在运行中）
-            if (this._autoEternalRunning) {
+            // 停止或更新进度
+            if (!this._autoEternalRunning) {
+                this._finishAutoEternal({ reason: 'stopped', bought: stepResult?.totalBought || 0, spent: stepResult?.totalSpent || 0, synthesized: stepResult?.totalSynthesized || 0, rounds: batchCount }, infoEl, barEl, stopBtn, overlay);
+            } else {
                 infoEl.innerHTML = `第 ${batchCount} 轮...<br>已购买 ${stepResult.totalBought} 颗 | 花费 ${stepResult.totalSpent.toLocaleString()} 金币 | 合成 ${stepResult.totalSynthesized} 次`;
                 barEl.style.width = Math.min(100, (batchCount % 500) / 500 * 100) + '%';
                 setTimeout(runBatch, 0); // 让出主线程
