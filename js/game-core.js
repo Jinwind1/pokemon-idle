@@ -2674,7 +2674,19 @@ class GameCore {
         }
 
         try {
-            localStorage.setItem('pokemon_idle_save', JSON.stringify(this.gameState));
+            const json = JSON.stringify(this.gameState);
+            let dataToSave = json;
+            // 使用 LZString 压缩（兼容老存档：压缩后以特定前缀标记）
+            if (typeof LZString !== 'undefined') {
+                const compressed = LZString.compressToUTF16(json);
+                if (compressed.length < json.length) {
+                    dataToSave = 'LZ:' + compressed;
+                    console.log(`[存档] 压缩 ${json.length} → ${dataToSave.length} 字符（${(1 - dataToSave.length/json.length * 100).toFixed(1)}%）`);
+                } else {
+                    console.log(`[存档] 压缩未获益，保持原样 (${json.length})`);
+                }
+            }
+            localStorage.setItem('pokemon_idle_save', dataToSave);
         } catch (e) {
             console.error('保存失败:', e);
         }
@@ -2682,9 +2694,25 @@ class GameCore {
 
     load() {
         try {
-            const data = localStorage.getItem('pokemon_idle_save');
-            if (data) {
-                const parsed = JSON.parse(data);
+            const raw = localStorage.getItem('pokemon_idle_save');
+            if (!raw) return false;
+
+            let data = raw;
+            // 兼容：新存档以 "LZ:" 开头表示已压缩，老存档直接是JSON
+            if (raw.startsWith('LZ:')) {
+                if (typeof LZString !== 'undefined') {
+                    data = LZString.decompressFromUTF16(raw.slice(3));
+                    if (!data) {
+                        console.error('存档解压失败，数据可能损坏');
+                        return false;
+                    }
+                } else {
+                    console.error('LZString 库未加载，无法读取压缩存档');
+                    return false;
+                }
+            }
+
+            const parsed = JSON.parse(data);
                 // 验证数据完整性
                 if (!parsed || !parsed.team || !Array.isArray(parsed.team) || parsed.team.length === 0) {
                     console.warn('存档数据不完整，将重新开始');
@@ -2739,24 +2767,34 @@ class GameCore {
         return false;
     }
 
+    // 导出存档（用于复制粘贴）：压缩 + Base64
     exportSave() {
         if (!this.gameState) return '';
         this.save();
-        return btoa(unescape(encodeURIComponent(JSON.stringify(this.gameState))));
+        const json = JSON.stringify(this.gameState);
+        const payload = (typeof LZString !== 'undefined')
+            ? 'LZ:' + LZString.compressToUTF16(json)
+            : json;
+        return btoa(unescape(encodeURIComponent(payload)));
     }
 
     importSave(dataStr) {
         try {
-            let decoded;
             const raw = atob(dataStr.trim());
+            let decoded;
             try {
-                // 新版存档：UTF-8 编码
                 decoded = decodeURIComponent(escape(raw));
             } catch (_) {
-                // 旧版存档：纯 Latin1
                 decoded = raw;
             }
-            const data = JSON.parse(decoded);
+            // 兼容压缩存档
+            let dataStr2 = decoded;
+            if (decoded.startsWith('LZ:')) {
+                if (!LZString) throw new Error('LZString 库未加载');
+                dataStr2 = LZString.decompressFromUTF16(decoded.slice(3));
+                if (!dataStr2) throw new Error('存档解压失败');
+            }
+            const data = JSON.parse(dataStr2);
 
             // 基本验证
             if (!data.team || !Array.isArray(data.team) || data.team.length === 0) {

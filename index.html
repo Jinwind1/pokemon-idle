@@ -18,7 +18,7 @@
     <div id="app">
         <!-- 顶部状态栏 -->
         <header id="header">
-            <h1>宝可梦收集放置 <span class="version-tag">v2.47</span></h1>
+            <h1>宝可梦收集放置 <span class="version-tag">v2.48</span></h1>
             <span class="author-tag">by: jinwind</span>
         </header>
 
@@ -366,9 +366,9 @@
                         <h3>📝 版本更新记录</h3>
                         <div id="changelog" class="changelog">
                             <div class="changelog-item">
-                                <div class="changelog-version">v2.47 <span class="changelog-date">2026-04-07</span></div>
+                                <div class="changelog-version">v2.48 <span class="changelog-date">2026-04-07</span></div>
                                 <ul class="changelog-list">
-                                    <li>🐛 修复打开/刷新页面时不触发离线计算的问题：现在根据存档的 lastSave 时间戳自动结算离线收益</li>
+                                    <li>📦 存档压缩：使用 LZString 压缩存档数据，大幅减少 localStorage 占用空间（兼容老存档自动识别）</li>
                                     <li>🏰 挑战塔最高层数从100层提升至150层</li>
                                     <li>🚀 重构"一键购买并合成永恒"为异步分批执行：每50轮让出主线程，显示实时进度条和统计信息</li>
                                     <li>🛑 一键合成永恒新增停止按钮：运行中可随时中断，不再卡死浏览器</li>
@@ -441,6 +441,7 @@
     </div>
 
 
+    <script src="js/lzstring.min.js"></script>
     <script src="js/pokemon-data.js"></script>
     <script src="js/route-data.js"></script>
     <script src="js/game-config.js"></script>
