@@ -2928,8 +2928,12 @@ class GameUI {
                     : '🎒 背包已满且无法继续合成';
         infoEl.innerHTML = `${reasonText}<br><small>共购买 ${result.bought} 颗，花费 ${result.spent.toLocaleString()} 金币，合成 ${result.synthesized} 次（${result.rounds} 轮）</small>`;
         barEl.style.width = '100%';
-        stopBtn.textContent = '完成';
-        stopBtn.onclick = () => { overlay.remove(); this.renderBadgePage(); };
+        // 克隆替换按钮，清除所有旧的 eventListener
+        const doneBtn = stopBtn.cloneNode(true);
+        doneBtn.textContent = '完成';
+        doneBtn.disabled = false;
+        doneBtn.addEventListener('click', () => { overlay.remove(); this.renderBadgePage(); });
+        stopBtn.parentNode.replaceChild(doneBtn, stopBtn);
     }
 
     showReforgeDialog() {
