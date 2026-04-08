@@ -3974,24 +3974,29 @@ class GameCore {
     }
 
     // 获取种族值>500的宝可梦ID候选池（缓存）
-    _getTowerCandidatePool() {
-        if (this._towerCandidatePool) return this._towerCandidatePool;
+    _getTowerCandidatePool(floor = 0) {
+        // 151层及以上使用高种族值池（>580），普通层用>500
+        const useElitePool = floor >= 151;
+        const cacheKey = useElitePool ? '_towerCandidatePoolElite' : '_towerCandidatePool';
+        if (this[cacheKey]) return this[cacheKey];
+
+        const minTotal = useElitePool ? 580 : TOWER_MIN_BASE_STAT_TOTAL;
         const pool = [];
         for (const id in POKEMON_DATA) {
             const data = POKEMON_DATA[id];
             if (!data.baseStats) continue;
             const total = Object.values(data.baseStats).reduce((a, b) => a + b, 0);
-            if (total > TOWER_MIN_BASE_STAT_TOTAL) {
+            if (total > minTotal) {
                 pool.push(parseInt(id));
             }
         }
-        this._towerCandidatePool = pool;
+        this[cacheKey] = pool;
         return pool;
     }
 
     // 生成挑战塔某层的6只敌方宝可梦ID列表（只存id，不缓存属性）
     generateTowerFloorEnemies(floor) {
-        const pool = this._getTowerCandidatePool();
+        const pool = this._getTowerCandidatePool(floor);
         const enemyIds = [];
         const usedIds = new Set();
 

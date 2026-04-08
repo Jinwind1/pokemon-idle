@@ -18,7 +18,7 @@
     <div id="app">
         <!-- 顶部状态栏 -->
         <header id="header">
-            <h1>宝可梦收集放置 <span class="version-tag">v2.49</span></h1>
+            <h1>宝可梦收集放置 <span class="version-tag">v2.50</span></h1>
             <span class="author-tag">by: jinwind</span>
         </header>
 
@@ -366,16 +366,10 @@
                         <h3>📝 版本更新记录</h3>
                         <div id="changelog" class="changelog">
                             <div class="changelog-item">
-                                <div class="changelog-version">v2.49 <span class="changelog-date">2026-04-07</span></div>
+                                <div class="changelog-version">v2.50 <span class="changelog-date">2026-04-08</span></div>
                                 <ul class="changelog-list">
-                                    <li>📦 存档压缩：使用 LZString 压缩存档数据，大幅减少 localStorage 占用空间（兼容老存档自动识别）</li>
-                                    <li>🏰 挑战塔最高层数从100层提升至150层</li>
-                                    <li>🚀 重构"一键购买并合成永恒"为异步分批执行：每50轮让出主线程，显示实时进度条和统计信息</li>
-                                    <li>🛑 一键合成永恒新增停止按钮：运行中可随时中断，不再卡死浏览器</li>
-                                    <li>🔧 修复树果喂食上限计算：种族值251等不能整除5的情况也能继续吃果子（实际加成仍封顶255）</li>
-                                    <li>🔧 修正755号宝可梦名字：甜竹竹→睡睡菇，756号：灿烂甜竹竹→灯罩夜菇</li>
-                                    <li>🐛 修复一键合成永恒进度条弹窗不显示的问题（dialog-overlay 改为 modal-overlay）</li>
-                                    <li>🐛 修复一键合成永恒完成后"完成"按钮点不了的问题（cloneNode 清除旧 eventListener）</li>
+                                    <li>🏰 挑战塔最高层数从150层提升至200层</li>
+                                    <li>🏰 挑战塔151层及以上敌人改为种族值580以上的高强度宝可梦候选池</li>
                                     <li>⚡ 大幅优化"一键购买并合成永恒"性能：canSynthMore 用 Map 计数替代 O(n²) 嵌套遍历，合成流程预分组+内联跳过冗余验证和逐次存档</li>
                                     <li>🐛 修复宝石UID重复导致合成失败的问题（generateUUID 改用 crypto.randomUUID + 迁移修复旧存档）</li>
                                 </ul>

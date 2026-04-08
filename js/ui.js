@@ -403,7 +403,7 @@ class GameUI {
                         this.showToast('💎 自动切换地图已解锁！可在设置中开启');
                     }, 2000);
                     setTimeout(() => {
-                        this.showToast('🏝️ 挑战岛已解锁！挑战100层塔获取全局加成');
+                        this.showToast('🏝️ 挑战岛已解锁！挑战获取全局加成');
                     }, 4000);
                 }
                 break;
@@ -3377,7 +3377,7 @@ class GameUI {
 
                 // 全部通关 100 层
                 if (tower.currentFloor >= TOWER_MAX_FLOOR && tower.highestFloor >= TOWER_MAX_FLOOR) {
-                    startBtn.textContent = '🏆 已通关全部 100 层！';
+                    startBtn.textContent = `🏆 已通关全部 ${tower.currentFloor} 层！`;
                     startBtn.disabled = true;
                     startBtn.classList.add('maxed');
                 } else {
