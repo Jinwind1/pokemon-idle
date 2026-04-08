@@ -15,6 +15,7 @@
 //     7     | 阿罗拉   |  14条  |  60~100级        | 2411 - 3600
 //     8     | 伽勒尔   |  15条  |   200级          | 3601 - 6600
 //     9     | 帕底亚   |  14条  | 500~1000级       | 6601 - 17000
+//    10     | Mega进化 |  10条  |   1500级         | 17001 - 32000
 //
 // 规则说明：
 //   - 新地区的起始等级 = 上一个地区最后一条道路的最高等级 + 1。
@@ -2851,6 +2852,105 @@ const REGIONS = {
                     { id: 1025, weight: 5, levelRange: [16001, 17000] },   // 桃歹郎
                     { id: 1007, weight: 1, levelRange: [17000, 17000] },   // 故勒顿
                     { id: 1008, weight: 1, levelRange: [17000, 17000] },   // 密勒顿
+                ]
+            },
+        ]
+    },
+
+    // ===================== 第10地区: Mega进化地区 (ID 1026-1073) =====================
+    mega: {
+        id: 'mega',
+        name: 'Mega进化地区',
+        nameEn: 'Mega Evolution',
+        description: '超越极限的Mega进化之地，经典Mega宝可梦聚集于此。需完成帕底亚图鉴方可进入。',
+        unlockCondition: { type: 'pokedex_complete', region: 'paldea', range: [906, 1025] },
+        routes: [
+            {
+                id: 'mega_route1',
+                name: 'Mega觉醒之路',
+                description: '初代Mega进化的觉醒之地，关都初始御三家和虫系Mega汇聚于此',
+                levelRange: [17001, 18500],
+                pokemon: [
+                    { id: 1026, weight: 12, levelRange: [17001, 18500] },  // Mega妙蛙花
+                    { id: 1029, weight: 12, levelRange: [17001, 18500] },  // Mega水箭龟
+                    { id: 1027, weight: 10, levelRange: [17001, 18500] },  // Mega喷火龙X
+                    { id: 1028, weight: 10, levelRange: [17001, 18500] },  // Mega喷火龙Y
+                    { id: 1030, weight: 10, levelRange: [17001, 18500] },  // Mega大针蜂
+                    { id: 1031, weight: 10, levelRange: [17001, 18500] },  // Mega大比鸟
+                    { id: 1032, weight: 10, levelRange: [17001, 18500] },  // Mega胡地
+                    { id: 1033, weight: 10, levelRange: [17001, 18500] },  // Mega呆壳兽
+                    { id: 1034, weight: 8, levelRange: [17001, 18500] },   // Mega耿鬼
+                    { id: 1035, weight: 8, levelRange: [17001, 18500] },   // Mega袋兽
+                ]
+            },
+            {
+                id: 'mega_route2',
+                name: 'Mega进化之森',
+                description: '暗藏强大Mega力量的森林，关都后期Mega宝可梦出没',
+                levelRange: [18501, 20000],
+                pokemon: [
+                    { id: 1043, weight: 12, levelRange: [18501, 20000] },  // Mega巨钳螳螂
+                    { id: 1044, weight: 12, levelRange: [18501, 20000] },  // Mega赫拉克罗斯
+                    { id: 1036, weight: 10, levelRange: [18501, 20000] },  // Mega大甲
+                    { id: 1037, weight: 10, levelRange: [18501, 20000] },  // Mega暴鲤龙
+                    { id: 1038, weight: 10, levelRange: [18501, 20000] },  // Mega化石翼龙
+                    { id: 1041, weight: 10, levelRange: [18501, 20000] },  // Mega电龙
+                    { id: 1042, weight: 10, levelRange: [18501, 20000] },  // Mega大钢蛇
+                    { id: 1045, weight: 10, levelRange: [18501, 20000] },  // Mega黑鲁加
+                    { id: 1039, weight: 5, levelRange: [19000, 20000] },   // Mega超梦X
+                    { id: 1040, weight: 5, levelRange: [19000, 20000] },   // Mega超梦Y
+                ]
+            },
+            {
+                id: 'mega_route3',
+                name: 'Mega岩浆峡谷',
+                description: '城都与丰缘强力Mega宝可梦栖息的灼热峡谷',
+                levelRange: [20001, 21500],
+                pokemon: [
+                    { id: 1051, weight: 12, levelRange: [20001, 21500] },  // Mega勾魂眼
+                    { id: 1052, weight: 12, levelRange: [20001, 21500] },  // Mega大嘴娃
+                    { id: 1047, weight: 10, levelRange: [20001, 21500] },  // Mega蜥蜴王
+                    { id: 1048, weight: 10, levelRange: [20001, 21500] },  // Mega火焰鸡
+                    { id: 1049, weight: 10, levelRange: [20001, 21500] },  // Mega巨沼怪
+                    { id: 1050, weight: 10, levelRange: [20001, 21500] },  // Mega沙奈朵
+                    { id: 1053, weight: 10, levelRange: [20001, 21500] },  // Mega波士可多拉
+                    { id: 1054, weight: 10, levelRange: [20001, 21500] },  // Mega恰雷姆
+                    { id: 1046, weight: 8, levelRange: [20001, 21500] },   // Mega班基拉斯
+                ]
+            },
+            {
+                id: 'mega_route4',
+                name: 'Mega暴风海域',
+                description: '丰缘Mega后半部队驻守的狂风暴雨海域',
+                levelRange: [21501, 23000],
+                pokemon: [
+                    { id: 1055, weight: 10, levelRange: [21501, 23000] },  // Mega雷电兽
+                    { id: 1056, weight: 10, levelRange: [21501, 23000] },  // Mega巨牙鲨
+                    { id: 1057, weight: 10, levelRange: [21501, 23000] },  // Mega喷火驼
+                    { id: 1058, weight: 10, levelRange: [21501, 23000] },  // Mega七夕青鸟
+                    { id: 1059, weight: 10, levelRange: [21501, 23000] },  // Mega诅咒娃娃
+                    { id: 1060, weight: 10, levelRange: [21501, 23000] },  // Mega阿勃梭鲁
+                    { id: 1061, weight: 10, levelRange: [21501, 23000] },  // Mega冰鬼护
+                    { id: 1062, weight: 8, levelRange: [21501, 23000] },   // Mega暴飞龙
+                    { id: 1063, weight: 8, levelRange: [21501, 23000] },   // Mega巨金怪
+                    { id: 1064, weight: 7, levelRange: [21501, 23000] },   // Mega拉帝亚斯
+                ]
+            },
+            {
+                id: 'mega_route5',
+                name: 'Mega极光冰原',
+                description: '传说级Mega宝可梦与神奥Mega聚集的极寒之地',
+                levelRange: [23001, 24500],
+                pokemon: [
+                    { id: 1070, weight: 12, levelRange: [23001, 24500] },  // Mega雪暴王
+                    { id: 1072, weight: 12, levelRange: [23001, 24500] },  // Mega差不多娃娃
+                    { id: 1067, weight: 12, levelRange: [23001, 24500] },  // Mega长耳兔
+                    { id: 1071, weight: 10, levelRange: [23001, 24500] },  // Mega艾路雷朵
+                    { id: 1068, weight: 8, levelRange: [23001, 24500] },   // Mega烈咬陆鲨
+                    { id: 1069, weight: 8, levelRange: [23001, 24500] },   // Mega路卡利欧
+                    { id: 1073, weight: 8, levelRange: [23001, 24500] },   // Mega蒂安希
+                    { id: 1065, weight: 7, levelRange: [23001, 24500] },   // Mega拉帝欧斯
+                    { id: 1066, weight: 3, levelRange: [24000, 24500] },   // Mega裂空座
                 ]
             },
         ]

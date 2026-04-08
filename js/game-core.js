@@ -280,7 +280,8 @@ class GameCore {
         const cachedTowerExpBonus = this.getTowerBonus();
         const cachedTeamExpRate = 0.5; // 天赋已改为怪物等级提升，不再影响经验
         const cachedTalentPokedexExpBonus = this.getTalentValue('pokedex_exp_bonus');
-        const cachedReserveExpRate = 0.01 * (1 + cachedTalentPokedexExpBonus / 100);
+        const cachedBadgePokedexExpBonus = this.getBadgeEffectValue('pokedex_exp_bonus') || 0;
+        const cachedReserveExpRate = 0.01 * (1 + cachedTalentPokedexExpBonus / 100 + cachedBadgePokedexExpBonus);
         const cachedHealPercent = 0.1 * (1 + (gemBonuses.victory_heal || 0) / 100);
 
         // #2 缓存队伍战斗属性（仅升级时刷新）
@@ -1229,7 +1230,8 @@ class GameCore {
 
         // 图鉴宝可梦获得1%经验
         const talentPokedexExpBonus = this.getTalentValue('pokedex_exp_bonus');
-        const reserveExpRate = 0.01 * (1 + talentPokedexExpBonus / 100);
+        const badgePokedexExpBonus = this.getBadgeEffectValue('pokedex_exp_bonus') || 0;
+        const reserveExpRate = 0.01 * (1 + talentPokedexExpBonus / 100 + badgePokedexExpBonus);
         const reserveExp = Math.ceil(expGained * reserveExpRate);
         for (const pokemonId in this.gameState.caughtPokemon) {
             const id = parseInt(pokemonId);
@@ -2070,6 +2072,10 @@ class GameCore {
         if (evoId >= 906 && evoId <= 1025) {
             return this.isRegionUnlocked('paldea');
         }
+        // Mega进化精灵（ID 1026-1073）需要Mega地区解锁
+        if (evoId >= 1026 && evoId <= 1073) {
+            return this.isRegionUnlocked('mega');
+        }
         // 一代精灵默认解锁
         return true;
     }
@@ -2181,6 +2187,7 @@ class GameCore {
             const wasAlolaUnlocked = this.isRegionUnlocked('alola');
             const wasGalarUnlocked = this.isRegionUnlocked('galar');
             const wasPaldeaUnlocked = this.isRegionUnlocked('paldea');
+            const wasMegaUnlocked = this.isRegionUnlocked('mega');
             
             // 首次捕获
             this.catchPokemonWithIvs(wildPokemon.id, 1, wildPokemon.ivs);
@@ -2238,6 +2245,13 @@ class GameCore {
             if (!wasPaldeaUnlocked && this.isRegionUnlocked('paldea')) {
                 if (this.onBattleEvent) {
                     this.onBattleEvent('regionUnlocked', { regionId: 'paldea', regionName: '帕底亚地区' });
+                }
+            }
+
+            // 检查是否因此次捕获解锁了Mega进化地区
+            if (!wasMegaUnlocked && this.isRegionUnlocked('mega')) {
+                if (this.onBattleEvent) {
+                    this.onBattleEvent('regionUnlocked', { regionId: 'mega', regionName: 'Mega进化地区' });
                 }
             }
 
@@ -2614,6 +2628,7 @@ class GameCore {
             alola: [722, 809],
             galar: [810, 905],
             paldea: [906, 1025],
+            mega: [1026, 1073],
         };
         const range = regionRanges[regionId];
         if (!range) return this.getPokedexStats();
@@ -2846,7 +2861,7 @@ class GameCore {
     // ===================== 徽章系统 =====================
     // 检查某地区是否通关（所有宝可梦已捕获）
     isRegionCompleted(regionId) {
-        const regionRanges = { kanto: [1, 151], johto: [152, 251], hoenn: [252, 386], sinnoh: [387, 493], unova: [494, 649], kalos: [650, 721], alola: [722, 809], galar: [810, 905], paldea: [906, 1025] };
+        const regionRanges = { kanto: [1, 151], johto: [152, 251], hoenn: [252, 386], sinnoh: [387, 493], unova: [494, 649], kalos: [650, 721], alola: [722, 809], galar: [810, 905], paldea: [906, 1025], mega: [1026, 1073] };
         const range = regionRanges[regionId];
         if (!range) return false;
         const [start, end] = range;
@@ -3716,9 +3731,11 @@ class GameCore {
     // 根据天赋计算怪物等级提升后的新等级
     // 公式: L' = L + (30000 - L) × (X / 100)
     // L=原始等级, X=天赋等级, 满级时全图怪物均为30000级
+    // 注意: 原始等级 >= 30000 的怪物不受天赋影响（Mega地区等高等级区域）
     getMonsterLevelBoost(originalLevel) {
         const talentLevel = this.getTalentLevel('team_exp_bonus');
         if (talentLevel <= 0) return originalLevel;
+        if (originalLevel >= 30000) return originalLevel; // 超过3W级不受天赋影响
         const boosted = originalLevel + (30000 - originalLevel) * (talentLevel / 100);
         return Math.round(boosted);
     }

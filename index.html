@@ -18,7 +18,7 @@
     <div id="app">
         <!-- 顶部状态栏 -->
         <header id="header">
-            <h1>宝可梦收集放置 <span class="version-tag">v2.50</span></h1>
+            <h1>宝可梦收集放置 <span class="version-tag">v2.64</span></h1>
             <span class="author-tag">by: jinwind</span>
         </header>
 
@@ -261,6 +261,7 @@
                         <button class="region-filter-btn" data-region="alola">阿罗拉地区</button>
                         <button class="region-filter-btn" data-region="galar">伽勒尔地区</button>
                         <button class="region-filter-btn" data-region="paldea">帕底亚地区</button>
+                        <button class="region-filter-btn" data-region="mega">Mega地区</button>
                     </div>
                     <div id="pokedex-filters">
                         <button class="filter-btn active" data-filter="all">全部</button>
@@ -366,24 +367,23 @@
                         <h3>📝 版本更新记录</h3>
                         <div id="changelog" class="changelog">
                             <div class="changelog-item">
-                                <div class="changelog-version">v2.50 <span class="changelog-date">2026-04-08</span></div>
+                                <div class="changelog-version">v2.64 <span class="changelog-date">2026-04-08</span></div>
                                 <ul class="changelog-list">
+                                    <li>🌟 新增第10地区「Mega进化地区」，包含5条道路，等级范围17001-24500</li>
+                                    <li>🧬 新增48只经典Mega宝可梦（ID 1026-1073）（Z-A的新Mega精灵没有合适的立绘暂不添加）（极巨化和钛晶化永远不会加入）</li>
+                                    <li>🏅 新增Mega徽章：完成Mega图鉴后，图鉴内宝可梦经验增加50%</li>
                                     <li>🏰 挑战塔最高层数从150层提升至200层</li>
-                                    <li>🏰 挑战塔151层及以上敌人改为种族值580以上的高强度宝可梦候选池</li>
                                 </ul>
                             </div>
                             <div class="changelog-item">
                                 <div class="changelog-version">v2.49 <span class="changelog-date">2026-04-07</span></div>
                                 <ul class="changelog-list">
-                                    <li>⚡ 大幅优化"一键购买并合成永恒"性能：canSynthMore 用 Map 计数替代 O(n²) 嵌套遍历，合成流程预分组+内联跳过冗余验证和逐次存档</li>
-                                    <li>📦 存档压缩：使用 LZString 压缩存档数据，大幅减少 localStorage 占用空间（兼容老存档自动识别）</li>
+                                    <li>⚡ 大幅优化"一键购买并合成永恒"性能</li>
+                                    <li>📦 存档压缩：大幅减少占用空间</li>
                                     <li>🏰 挑战塔最高层数从100层提升至150层</li>
-                                    <li>🚀 重构"一键购买并合成永恒"为异步分批执行：每50轮让出主线程，显示实时进度条和统计信息</li>
-                                    <li>🛑 一键合成永恒新增停止按钮：运行中可随时中断，不再卡死浏览器</li>
+                                    <li>🚀 重构"一键购买并合成永恒"为异步分批执行</li>
                                     <li>🔧 修复树果喂食上限计算：种族值251等不能整除5的情况也能继续吃果子（实际加成仍封顶255）</li>
                                     <li>🔧 修正755号宝可梦名字：甜竹竹→睡睡菇，756号：灿烂甜竹竹→灯罩夜菇</li>
-                                    <li>🐛 修复一键合成永恒进度条弹窗不显示的问题（dialog-overlay 改为 modal-overlay）</li>
-                                    <li>🐛 修复一键合成永恒完成后"完成"按钮点不了的问题（cloneNode 清除旧 eventListener）</li>
                                 </ul>
                             </div>
                             <div class="changelog-item">
@@ -397,12 +397,9 @@
                                 <div class="changelog-version">v2.13 <span class="changelog-date">2026-04-02</span></div>
                                 <ul class="changelog-list">
                                     <li>🎨 图鉴界面改为自适应多列网格布局，根据屏幕宽度动态排列更多卡片</li>
-                                    <li>🔧 图鉴卡片最小宽度从240px提高到280px，修复名字被挤成竖排的问题</li>
-                                    <li>🐛 修复iOS Safari下图鉴列表高度坍塌只显示1个卡片的问题</li>
                                     <li>🐛 修复图鉴卡片窄宽度下技能等级和按钮被挤出不可见的问题</li>
                                     <li>🐛 修复喂食树果后野生怪物和挑战塔敌人也享受树果种族值加成的bug</li>
                                     <li>🔧 重构挑战塔敌人存储：只保存ID列表，战斗时实时计算属性（减小存档体积+彻底修复缓存属性问题）</li>
-                                    <li>🎨 修复手机端宝石悬浮面板偏出屏幕的问题，触摸设备居中显示（用hover:none判断，不影响PC窄窗口）</li>
                                     <li>✨ 图鉴新增搜索框，支持按名称或编号搜索宝可梦</li>
                                 </ul>
                             </div>
@@ -410,7 +407,6 @@
                                 <div class="changelog-version">v1.97 <span class="changelog-date">2026-04-01</span></div>
                                 <ul class="changelog-list">
                                     <li>✨ 挑战塔支持自动换最优宝可梦（与主线战斗一致）</li>
-                                    <li>✨ 宝石面板支持手机点击查看（不再依赖鼠标悬停）</li>
                                     <li>🎨 优化手机竖屏战斗界面布局（缩小精灵图、信息框和间距）</li>
                                     <li>🐛 修复宝石面板PC端点击与hover行为冲突的问题</li>
                                     <li>🐛 修复挑战塔内手动换人时HP比例未同步的问题</li>
@@ -418,7 +414,6 @@
                                     <li>🐛 修复挑战塔击败敌人时HP条没有归零动画的问题</li>
                                     <li>🐛 修复挑战岛怪物精灵图不显示的问题</li>
                                     <li>🐛 修复挑战岛怪物名字显示不全的问题</li>
-                                    <li>🐛 修复导出存档中文字符报错的问题</li>
                                 </ul>
                             </div>
                         </div>

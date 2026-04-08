@@ -1111,7 +1111,7 @@ class GameUI {
             caughtEl.textContent = `已捕获: ${stats.caught}/${stats.total}`;
         } else {
             const regionStats = this.game.getPokedexStatsByRegion(this.pokedexRegionFilter);
-            const regionNames = { kanto: '关都', johto: '城都', hoenn: '丰缘', sinnoh: '神奥', unova: '合众', kalos: '卡洛斯', alola: '阿罗拉', galar: '伽勒尔', paldea: '帕底亚' };
+            const regionNames = { kanto: '关都', johto: '城都', hoenn: '丰缘', sinnoh: '神奥', unova: '合众', kalos: '卡洛斯', alola: '阿罗拉', galar: '伽勒尔', paldea: '帕底亚', mega: 'Mega' };
             const regionName = regionNames[this.pokedexRegionFilter] || this.pokedexRegionFilter;
             caughtEl.textContent = `${regionName}地区已捕获: ${regionStats.caught}/${regionStats.total}`;
         }
@@ -1153,6 +1153,8 @@ class GameUI {
             allIds = allIds.filter(id => id >= 810 && id <= 905);
         } else if (this.pokedexRegionFilter === 'paldea') {
             allIds = allIds.filter(id => id >= 906 && id <= 1025);
+        } else if (this.pokedexRegionFilter === 'mega') {
+            allIds = allIds.filter(id => id >= 1026 && id <= 1073);
         }
 
         // 搜索过滤

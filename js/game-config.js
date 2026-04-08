@@ -78,6 +78,14 @@ const BADGE_DATA = {
         effectType: 'offline_time_bonus',
         value: 48 * 60 * 60 * 1000, // 48小时（毫秒）
     },
+    mega: {
+        name: 'Mega徽章',
+        icon: '🔥',
+        description: 'Mega进化地区解锁后，完成Mega图鉴获得',
+        effect: '图鉴内宝可梦经验增加50%',
+        effectType: 'pokedex_exp_bonus',
+        value: 0.5, // +50%
+    },
 };
 
 // ===================== 宝石系统配置 =====================
@@ -374,7 +382,7 @@ const TALENT_DATA = {
         id: 'team_exp_bonus',
         name: '野生怪物等级提升',
         icon: '👥',
-        description: '提高野外遇到的怪物等级，满级时全图怪物均为30000级（挑战塔除外）',
+        description: '提高野外遇到的怪物等级，满级时全图怪物均为30000级（挑战塔除外，超过30000级的怪物不受影响）',
         maxLevel: 100,
         perLevel: 1,
         unit: '',
