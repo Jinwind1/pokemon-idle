@@ -3224,7 +3224,11 @@ class GameUI {
             if (bonuses[attr.id] > 0) {
                 const line = document.createElement('div');
                 line.className = 'gem-bonus-line';
-                line.innerHTML = `<span>${attr.icon} ${attr.name}</span><span class="gem-bonus-value">+${bonuses[attr.id]}${attr.unit}</span>`;
+                let valueText = `+${bonuses[attr.id]}${attr.unit}`;
+                if (attr.id === 'dodge_rate' && bonuses[attr.id] > 75) {
+                    valueText += `（上限：75%）`;
+                }
+                line.innerHTML = `<span>${attr.icon} ${attr.name}</span><span class="gem-bonus-value">${valueText}</span>`;
                 container.appendChild(line);
             }
         }

@@ -3992,12 +3992,22 @@ class GameCore {
 
     // 获取种族值>500的宝可梦ID候选池（缓存）
     _getTowerCandidatePool(floor = 0) {
-        // 151层及以上使用高种族值池（>580），普通层用>500
-        const useElitePool = floor >= 151;
-        const cacheKey = useElitePool ? '_towerCandidatePoolElite' : '_towerCandidatePool';
+        // 201层及以上使用超高种族值池（>650），151-200层使用高种族值池（>580），普通层用>500
+        let usePool, cacheKey, minTotal;
+        if (floor >= 201) {
+            usePool = 'ultra';
+            cacheKey = '_towerCandidatePoolUltra';
+            minTotal = 650;
+        } else if (floor >= 151) {
+            usePool = 'elite';
+            cacheKey = '_towerCandidatePoolElite';
+            minTotal = 580;
+        } else {
+            usePool = 'normal';
+            cacheKey = '_towerCandidatePool';
+            minTotal = TOWER_MIN_BASE_STAT_TOTAL;
+        }
         if (this[cacheKey]) return this[cacheKey];
-
-        const minTotal = useElitePool ? 580 : TOWER_MIN_BASE_STAT_TOTAL;
         const pool = [];
         for (const id in POKEMON_DATA) {
             const data = POKEMON_DATA[id];

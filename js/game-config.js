@@ -430,7 +430,7 @@ const TALENT_CATEGORIES = {
 };
 
 // ===================== 挑战塔配置 =====================
-const TOWER_MAX_FLOOR = 200;            // 最高层数
+const TOWER_MAX_FLOOR = 255;            // 最高层数
 const TOWER_ENEMIES_PER_FLOOR = 6;      // 每层敌人数量
 const TOWER_BASE_LEVEL = 18000;         // 第1层怪物等级
 const TOWER_LEVEL_INCREMENT = 1000;      // 每层等级递增
