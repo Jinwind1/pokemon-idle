@@ -18,7 +18,7 @@
     <div id="app">
         <!-- 顶部状态栏 -->
         <header id="header">
-            <h1>宝可梦收集放置 <span class="version-tag">v2.68</span></h1>
+            <h1>宝可梦收集放置 <span class="version-tag">v2.69</span></h1>
             <span class="author-tag">by: jinwind</span>
         </header>
 
@@ -356,6 +356,11 @@
                             <button id="btn-import" class="setting-btn">导入存档</button>
                             <button id="btn-delete" class="setting-btn danger">删除存档</button>
                         </div>
+                        <div class="settings-buttons">
+                            <button id="btn-export-file" class="setting-btn">📁 导出存档文件</button>
+                            <button id="btn-import-file" class="setting-btn">📂 加载存档文件</button>
+                            <input type="file" id="import-file-input" accept=".json,.txt" style="display:none">
+                        </div>
                         <textarea id="save-data-area" placeholder="存档数据将显示在这里..." rows="6"></textarea>
                     </div>
                     <div class="settings-section">
@@ -367,10 +372,11 @@
                         <h3>📝 版本更新记录</h3>
                         <div id="changelog" class="changelog">
                             <div class="changelog-item">
-                                <div class="changelog-version">v2.68 <span class="changelog-date">2026-04-10</span></div>
+                                <div class="changelog-version">v2.69 <span class="changelog-date">2026-04-10</span></div>
                                 <ul class="changelog-list">
                                     <li> 欢迎关注 https://www.gityx.com/ 后续我有新作品发布也会更新到上面 </li>
-                                    <li> 修复了导入存档时不计算离线收益的问题 </li>
+                                    <li>📁 存档管理新增「导出存档文件」和「加载存档文件」按钮，支持直接文件操作</li>
+                                    <li>🔧 修复导入存档时不计算离线收益的问题</li>
                                 </ul>
                             </div>
                             <div class="changelog-item">

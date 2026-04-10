@@ -153,6 +153,51 @@ class GameUI {
             });
         });
 
+        // 导出存档文件
+        document.getElementById('btn-export-file').addEventListener('click', () => {
+            const data = this.game.exportSave();
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const now = new Date();
+            const ts = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+            a.href = url;
+            a.download = `pokemon-idle-save-${ts}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            this.showToast('📁 存档文件已导出！');
+        });
+
+        // 加载存档文件
+        const importFileInput = document.getElementById('import-file-input');
+        document.getElementById('btn-import-file').addEventListener('click', () => {
+            importFileInput.value = '';
+            importFileInput.click();
+        });
+        importFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const data = evt.target.result.trim();
+                if (!data) {
+                    this.showToast('⚠️ 文件内容为空！');
+                    return;
+                }
+                if (this.game.importSave(data)) {
+                    this.showToast('📂 存档文件加载成功！');
+                    this.refreshAll();
+                    this.game.stopBattle();
+                    this._checkOfflineAfterImport();
+                } else {
+                    this.showToast('❌ 存档文件数据无效！');
+                }
+            };
+            reader.readAsText(file);
+        });
+
         // 玩法说明弹窗
         const gameplayHelpBtn = document.getElementById('btn-gameplay-help');
         if (gameplayHelpBtn) {
