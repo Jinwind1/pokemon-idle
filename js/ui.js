@@ -135,7 +135,8 @@ class GameUI {
                 this.showToast('✅ 存档导入成功！');
                 this.refreshAll();
                 this.game.stopBattle();
-                this.game.startBattle();
+                // 导入存档后检查是否需要离线结算
+                this._checkOfflineAfterImport();
             } else {
                 this.showToast('❌ 存档数据无效！');
             }
@@ -2019,6 +2020,24 @@ class GameUI {
     }
 
     // ===================== 通知 =====================
+    // 导入存档后检查离线结算
+    _checkOfflineAfterImport() {
+        const importedLastSave = this.game._importedLastSave;
+        this.game._importedLastSave = null;
+        if (importedLastSave) {
+            const elapsed = Date.now() - importedLastSave;
+            if (elapsed > 2000) {
+                const offlineBonusValue = this.game.getBadgeEffectValue('offline_time_bonus');
+                const maxOffline = offlineBonusValue !== null ? offlineBonusValue : (24 * 3600 * 1000);
+                const cappedElapsed = Math.min(elapsed, maxOffline);
+                console.log(`[离线-导入] 距上次保存 ${Math.floor(cappedElapsed / 60000)} 分钟，开始结算...`);
+                requestAnimationFrame(() => { this.game._processOfflineBattles(cappedElapsed); });
+                return; // _processOfflineBattles 完成后会自动 startBattle
+            }
+        }
+        this.game.startBattle();
+    }
+
     showToast(message) {
         const toast = document.createElement('div');
         toast.className = 'toast';

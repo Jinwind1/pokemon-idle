@@ -2820,6 +2820,8 @@ class GameCore {
             this.gameState = data;
             // 迁移修复：宝石重复uid（旧generateUID方案批量购买时碰撞）
             this._migrateFixGemUids();
+            // 记录导入前的lastSave，用于离线结算
+            this._importedLastSave = this.gameState.lastSave || null;
             this.save();
             return true;
         } catch (e) {
