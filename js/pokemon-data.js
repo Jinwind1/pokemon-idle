@@ -1084,7 +1084,7 @@ const POKEMON_DATA = {
     956: { id: 956, name: '超能艳鸵', types: ['psychic', 'flying'], baseStats: { hp: 95, atk: 60, def: 82, spAtk: 120, spDef: 81, speed: 52 }, expGroup: 'mediumSlow' },
     957: { id: 957, name: '小锻匠', types: ['fire', 'steel'], baseStats: { hp: 55, atk: 80, def: 50, spAtk: 35, spDef: 50, speed: 35 }, expGroup: 'medium', evolvesTo: { id: 958, level: 24 } },
     958: { id: 958, name: '巧锻匠', types: ['fire', 'steel'], baseStats: { hp: 65, atk: 100, def: 72, spAtk: 45, spDef: 66, speed: 43 }, expGroup: 'medium', evolvesTo: { id: 959, level: 38 } },
-    959: { id: 959, name: '巨锻匠', types: ['fire', 'steel'], baseStats: { hp: 90, atk: 130, def: 120, spAtk: 55, spDef: 80, speed: 40 }, expGroup: 'medium' },
+    959: { id: 959, name: '巨锻匠', types: ['fairy', 'steel'], baseStats: { hp: 90, atk: 130, def: 120, spAtk: 55, spDef: 80, speed: 40 }, expGroup: 'medium' },
     960: { id: 960, name: '海地鼠', types: ['water'], baseStats: { hp: 10, atk: 55, def: 25, spAtk: 35, spDef: 45, speed: 95 }, expGroup: 'medium', evolvesTo: { id: 961, level: 26 } },
     961: { id: 961, name: '三海地鼠', types: ['water'], baseStats: { hp: 35, atk: 100, def: 50, spAtk: 50, spDef: 70, speed: 120 }, expGroup: 'medium' },
     962: { id: 962, name: '下石鸟', types: ['flying', 'dark'], baseStats: { hp: 70, atk: 103, def: 85, spAtk: 60, spDef: 85, speed: 82 }, expGroup: 'medium' },
